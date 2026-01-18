@@ -2,66 +2,65 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Mój Panel Supla</title>
+    <title>Supla Panel</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #eceff1; }
-        .card { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #00d151; }
-        h2 { color: #555; margin-bottom: 10px; }
-        #wynik { font-size: 48px; font-weight: bold; color: #222; margin: 0; }
-        .unit { font-size: 24px; color: #888; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; min-width: 250px; }
+        h2 { color: #666; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+        #wynik { font-size: 60px; font-weight: bold; color: #00d151; margin: 20px 0; }
+        .status { font-size: 12px; color: #999; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h2>Temperatura</h2>
-    <p id="wynik">Ładowanie...</p>
+    <div id="wynik">...</div>
+    <div id="update" class="status">Inicjalizacja...</div>
 </div>
 
 <script>
-    // WKLEJ SWÓJ LINK PONIŻEJ (pamiętaj o /read na końcu)
-    const url = 'https://corsproxy.io/?'+encodeuricomponentsvr155.supla.org/direct/37/rJ5ahEY67sG_Q6j/read';
+    // TWOJE DANE
+    const mojLink = 'https://svr155.supla.org/direct/37/rJ5ahEY67sG_Q6j/read';
+    
+    // Używamy bramki CORS, która rozwiązuje problem "Ładowania..."
+    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(mojLink);
 
     async function pobierzDane() {
+        const wynikDiv = document.getElementById('wynik');
+        const updateDiv = document.getElementById('update');
+        
         try {
-            const response = await fetch(url);
-            const data = await response.json();
+            const response = await fetch(proxyUrl);
             
-            // Logowanie do konsoli (możesz sprawdzić pod F12 co dokładnie przychodzi)
-            console.log("Dane z Supli:", data);
+            if (!response.ok) throw new Error('Błąd serwera');
+            
+            const data = await response.json();
+            console.log("Odebrano:", data);
 
-            let temp = null;
+            // Wyciąganie temperatury (sprawdza różne możliwe nazwy pól)
+            let t = data.temperature ?? data.temp ?? (data.state ? data.state.temp : null) ?? (data.state ? data.state.temperature : null);
 
-            // Szukanie temperatury w różnych miejscach (zależnie od typu czujnika)
-            if (data.temperature !== undefined) {
-                temp = data.temperature;
-            } else if (data.state && data.state.temp !== undefined) {
-                temp = data.state.temp;
-            } else if (data.state && data.state.temperature !== undefined) {
-                temp = data.state.temperature;
-            } else if (data.channel && data.channel.state.temp !== undefined) {
-                temp = data.channel.state.temp;
-            }
-
-            if (temp !== null) {
-                // Zaokrąglanie do 1 miejsca po przecinku
-                document.getElementById('wynik').innerHTML = parseFloat(temp).toFixed(1) + '<span class="unit">°C</span>';
+            if (t !== null) {
+                wynikDiv.innerText = parseFloat(t).toFixed(1) + "°C";
+                updateDiv.innerText = "Aktualizacja: " + new Date().toLocaleTimeString();
             } else {
-                document.getElementById('wynik').innerText = "Brak odczytu";
+                wynikDiv.innerText = "???";
+                updateDiv.innerText = "Brak pola temperatury w danych";
             }
 
         } catch (error) {
-            console.error("Błąd:", error);
-            document.getElementById('wynik').innerText = "Błąd!";
+            console.error(error);
+            wynikDiv.innerText = "BŁĄD";
+            updateDiv.innerText = "Problem z połączeniem";
         }
     }
 
-    // Pobierz dane raz, a potem co 10 sekund
+    // Start
     pobierzDane();
-    setInterval(pobierzDane, 10000);
+    // Odświeżaj co 15 sekund
+    setInterval(pobierzDane, 15000);
 </script>
 
 </body>
 </html>
-
-
