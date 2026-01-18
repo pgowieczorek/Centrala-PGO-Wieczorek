@@ -2,7 +2,6 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -11,25 +10,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* ZMNIEJSZONY PADDING: Lepiej dla telefonów */
-            padding: 20px 0;
-            margin: 0;
+            padding: 80px;
         }
 
-        /* --- STYL OKNA LOGOWANIA --- */
+        /* --- STYL OKNA LOGOWANIA (NAŁOŻONY NA STRONĘ) --- */
         #login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #2c3e50; /* Zastępcze tło jeśli pliku brak */
+            background: url('20240312_105404.jpg'); /* Zdjęcie w oryginale */
             background-size: cover;
             background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10000;
+            z-index: 10000; /* Najwyższa warstwa */
         }
 
         .login-box {
@@ -63,24 +60,24 @@
             font-size: 16px;
         }
 
+        /* Ukrycie zawartości pod spodem do czasu zalogowania */
         .system-container, h2 { visibility: hidden; }
 
-        /* --- GŁÓWNY KONTENER --- */
+        /* --- TWOJE ORYGINALNE STYLE (BEZ ZMIAN) --- */
         .system-container {
             position: relative;
             width: 1200px;
             height: 1250px;
-            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7));
-            background-color: #fff;
+            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+                        url('20240312_105404.jpg');
+            background-size: cover;
+            background-position: center;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             overflow: hidden;
-            /* DODANO: Centrowanie kontenera */
-            margin: 0 auto;
         }
 
-        /* --- TWOJE ORYGINALNE STYLE (BEZ ZMIAN WYGLĄDU) --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -157,36 +154,61 @@
         <div class="pipe-sensor sensor-hot" style="left: 350px; top: 92px; font-size: 10px;" id="temp-gh-hot">T: -- °C</div>
         <div class="pipe pipe-h p-blue" style="width: 230px; left: 340px; top: 130px;"><div class="flow" style="animation-direction: reverse;"></div></div>
         <div class="pipe-sensor sensor-cold" style="left: 350px; top: 142px; font-size: 10px;" id="temp-gh-cold">T: -- °C</div>
-        
         <div class="device boiler boiler-small"><div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">Mały Kocioł<br> 0,6 MW<div class="chimney" style="left: 100px; top: -60px;"><div class="chimney-cap"></div><div style="position: absolute; top: -50px; left: 5px; color: #aaa; font-size: 40px; opacity: 0.8;">☁</div></div><div class="device fan fan-small" style="background: #fb8c00; border-color: #ef6c00;"><div class="fan-blade"></div>PALNIK</div><div class="fan-connector fan-connector-small"></div></div></div>
-        
         <div class="pipe pipe-h p-red" style="width: 270px; left: 180px; top: 490px;"><div class="flow"></div></div>
         <div class="pipe-sensor sensor-hot" style="left: 230px; top: 470px;" id="temp-boiler-small-hot">T: -- °C</div>
         <div class="pipe pipe-h p-blue" style="width: 370px; left: 180px; top: 510px;"><div class="flow"></div></div>
         <div class="pipe-sensor sensor-cold" style="left: 230px; top: 520px;" id="temp-boiler-small-cold">T: -- °C</div>
-
-        <div class="device boiler boiler-large"><div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">Kocioł Duży<br> 1.0 MW<div class="hopper"></div><div class="device fuel-feeder"><span style="font-size: 9px; margin-top: 5px;">ZASYP</span></div><div class="device fan"><div class="fan-blade"></div>WENT.</div><div class="fan-connector"></div><div class="pipe-sensor sensor-intake" style="left: 5px; top: 122px;" id="temp-intake-large">Temp. dolotu: -- °C</div></div></div>
-
-        <div class="device tunnel tunnel-1">
-            <div class="nursery-zone"><span style="font-size: 10px; color: #fff;">ROZSADNIK</span><div class="air-temp-mini" id="air-nursery">-- °C</div></div>
-            <span style="font-size: 11px; margin-top: 40px;">OBIEKT PRZÓD</span>
-            <div class="air-temp" id="air-t1">-- °C</div>
-        </div>
-
+        <div class="chimney" style="left: 330px; top: 620px;"><div class="chimney-cap"></div><div style="position: absolute; top: -50px; left: 5px; color: #aaa; font-size: 40px; opacity: 0.8;">☁</div></div>
+        <div class="pipe-sensor sensor-exhaust" style="left: 198px; top: 645px;" id="temp-exhaust-large">Temp. spalin: -- °C</div>
+        <div class="device boiler boiler-large"><div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">Kocioł Duży<br> 1.0 MW<div class="hopper"></div><div class="device fuel-feeder"><span style="font-size: 9px; margin-top: 5px;">ZASYP</span><div style="width: 60%; height: 15%; background: #111; margin-top: auto; margin-bottom: 10px; border-radius: 2px;"></div></div><div class="device fan"><div class="fan-blade"></div>WENT.</div><div class="fan-connector"></div><div class="pipe-sensor sensor-intake" style="left: 5px; top: 122px;" id="temp-intake-large">Temp. dolotu: -- °C</div></div></div>
+        <div class="pipe pipe-h p-red" style="width: 142px; left: 330px; top: 780px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-hot" style="left: 345px; top: 760px;" id="temp-boiler-large-hot">T: -- °C</div>
+        <div class="pipe pipe-h p-blue" style="width: 242px; left: 330px; top: 800px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-cold" style="left: 345px; top: 810px;" id="temp-boiler-large-cold">T: -- °C</div>
+        <div class="pipe pipe-v p-red" style="height: 220px; left: 460px; top: 560px;"><div class="v-flow"></div></div>
+        <div class="pipe pipe-v p-blue" style="height: 240px; left: 560px; top: 560px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
+        <div class="manifold manifold-supply"><div style="writing-mode: vertical-rl; transform: rotate(180deg); color: white;">KOLEKTOR - ZASILANIE</div></div>
+        <div class="manifold manifold-return"><div style="writing-mode: vertical-rl; transform: rotate(180deg); color: white;">KOLEKTOR - POWRÓT</div></div>
+        <div class="device tunnel tunnel-1"><div class="nursery-zone"><span style="font-size: 10px; color: #fff;">ROZSADNIK</span><div class="air-temp-mini" id="air-nursery">-- °C</div></div><span style="font-size: 11px; margin-top: 40px;">OBIEKT PRZÓD</span><div class="air-temp" id="air-t1">-- °C</div></div>
+        <div class="pipe pipe-h p-red" style="width: 215px; left: 485px; top: 45px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 27px; font-size: 10px;" id="temp-nursery-hot">T: -- °C</div>
+        <div class="pipe pipe-h p-blue" style="width: 115px; left: 585px; top: 65px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 77px; font-size: 10px;" id="temp-nursery-cold">T: -- °C</div>
+        <div class="pipe pipe-h p-red" style="width: 365px; left: 485px; top: 200px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 180px;" id="temp-t1-hot">T: -- °C</div>
+        <div class="pipe pipe-h p-blue" style="width: 265px; left: 585px; top: 220px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 230px;" id="temp-t1-cold">T: -- °C</div>
         <div class="device tunnel tunnel-2"><span style="font-size: 11px;">OBIEKT TYŁ</span><div class="air-temp" id="air-t2">-- °C</div></div>
-        
+        <div class="pipe pipe-h p-red" style="width: 374px; left: 476px; top: 340px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 320px;" id="temp-t2-hot">T: -- °C</div>
+        <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="flow"></div></div>
+        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 370px;" id="temp-t2-cold">T: -- °C</div>
         <div class="section-label" style="top: 900px;">System Nawadniania</div>
         <div class="device tank" style="left: 30px; width: 200px; height: 190px; top: 980px;"><div class="tank-info"><span style="font-size: 11px;">ZBIORNIK WODY<br>20.000 L</span><div class="water-temp" id="tank1-temp">-- °C</div></div><div class="level-group"><div class="vertical-level-container"><div id="tank1-bar" class="level-bar-v"></div></div><div id="tank1-label" class="level-label-v">--</div></div></div>
+        <div class="pipe pipe-h p-water" style="width: 60px; left: 230px; top: 1066px;"><div class="flow"></div></div>
+        <div class="device tank" style="left: 290px; height: 160px; top: 1010px; width: 180px;"><div class="tank-info"><span style="font-size: 11px;">PODGRZEWACZ<br>2.000 L</span><div class="water-temp" id="tank2-temp">-- °C</div></div><div class="level-group"><div class="vertical-level-container" style="height: 100px;"><div id="tank2-bar" class="level-bar-v"></div></div><div id="tank2-label" class="level-label-v">--</div></div></div>
+        <div class="pipe pipe-h p-water" style="width: 70px; left: 470px; top: 1066px;"><div class="flow"></div></div>
         <div class="device mixer" style="left: 540px; top: 1009px;">MIESZALNIK<div class="water-temp" id="mixer-temp" style="font-size: 14px;">-- °C</div></div>
+        <div class="pipe pipe-h p-water" style="width: 95px; left: 666px; top: 1066px;"><div class="flow"></div></div>
+        <div class="device valve" style="left: 730px; top: 990px;">Z2</div>
+        <div class="device valve" style="left: 730px; top: 1110px;">Z1</div>
+        <div class="pipe pipe-v p-water" style="height: 50px; left: 751px; top: 1025px;"><div class="v-flow"></div></div>
+        <div class="pipe pipe-v p-water" style="height: 56px; left: 751px; top: 1074px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
+        <div class="pipe pipe-h p-water" style="width: 360px; left: 780px; top: 1011px;"><div class="flow"></div></div>
+        <div class="pipe pipe-v p-water" style="height: 673px; left: 1140px; top: 350px;"><div class="v-flow"></div></div>
+        <div class="pipe pipe-h p-water" style="width: 110px; left: 1030px; top: 350px;"><div class="flow" style="animation-direction: reverse;"></div></div>
+        <div class="pipe pipe-h p-water" style="width: 400px; left: 780px; top: 1131px;"><div class="flow"></div></div>
+        <div class="pipe pipe-v p-water" style="height: 1023px; left: 1180px; top: 120px;"><div class="v-flow"></div></div>
+        <div class="pipe pipe-h p-water" style="width: 150px; left: 1030px; top: 120px;"><div class="flow" style="animation-direction: reverse;"></div></div>
     </div>
 
     <script>
         // --- KONFIGURACJA SUPLA ---
-        const linkSuplaT1 = 'TU_WKLEJ_TWÓJ_LINK_Z_SUPLI/read';
+        const linkSuplaT1 = 'https://svr155.supla.org/direct/39/cDhUT_QcRLegx/read';
 
         async function fetchSuplaTemp() {
             try {
-                // Cache-busting i Proxy dla braku blokad
                 const url = 'https://corsproxy.io/?' + encodeURIComponent(linkSuplaT1 + '?t=' + Date.now());
                 const res = await fetch(url);
                 const data = await res.json();
@@ -195,7 +217,7 @@
                     document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C";
                 }
             } catch (e) {
-                console.error("Błąd pobierania Supla T1");
+                console.error("Błąd Supla T1");
             }
         }
 
@@ -208,11 +230,11 @@
                 document.querySelector('.system-container').style.visibility = 'visible';
                 document.querySelector('h2').style.visibility = 'visible';
                 
-                // Start odświeżania Supli co 5 sekund
+                // Odświeżanie Supli co 5 sekund
                 setInterval(fetchSuplaTemp, 5000);
                 fetchSuplaTemp();
 
-                // Pozostałe symulacje
+                // Pozostałe animacje co 3 sekundy
                 setInterval(update, 3000);
                 update();
             } else {
@@ -221,14 +243,34 @@
         }
 
         function update() {
-            // Symulacja pozostałych czujników (bez air-t1)
+            // USUNIĘTO air-t1 z losowania, aby Supla miała wyłączność
             document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('air-nursery').innerText = (23 + Math.random() * 3).toFixed(1) + "°C";
             document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
             
-            // ... reszta Twoich losowań z funkcji update() ...
+            document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
+            document.getElementById('temp-intake-large').innerText = "Temp. dolotu: " + (18 + Math.random() * 6).toFixed(1) + "°C";
+
+            document.getElementById('temp-t1-hot').innerText = "T: " + (58 + Math.random() * 5).toFixed(1) + "°C";
+            document.getElementById('temp-t1-cold').innerText = "T: " + (38 + Math.random() * 5).toFixed(1) + "°C";
+            document.getElementById('temp-nursery-hot').innerText = "T: " + (62 + Math.random() * 4).toFixed(1) + "°C";
+            document.getElementById('temp-nursery-cold').innerText = "T: " + (45 + Math.random() * 4).toFixed(1) + "°C";
+            document.getElementById('temp-gh-hot').innerText = "T: " + (60 + Math.random() * 4).toFixed(1) + "°C";
+            document.getElementById('temp-gh-cold').innerText = "T: " + (42 + Math.random() * 4).toFixed(1) + "°C";
+            document.getElementById('temp-t2-hot').innerText = "T: " + (55 + Math.random() * 5).toFixed(1) + "°C";
+            document.getElementById('temp-t2-cold').innerText = "T: " + (35 + Math.random() * 5).toFixed(1) + "°C";
+
+            document.getElementById('temp-boiler-large-hot').innerText = "T: " + (75 + Math.random() * 10).toFixed(1) + "°C";
+            document.getElementById('temp-boiler-large-cold').innerText = "T: " + (45 + Math.random() * 5).toFixed(1) + "°C";
+            document.getElementById('temp-boiler-small-hot').innerText = "T: " + (70 + Math.random() * 8).toFixed(1) + "°C";
+            document.getElementById('temp-boiler-small-cold').innerText = "T: " + (40 + Math.random() * 6).toFixed(1) + "°C";
+
             document.getElementById('tank1-temp').innerText = (12 + Math.random() * 2).toFixed(1) + "°C";
+            document.getElementById('tank2-temp').innerText = (13 + Math.random() * 2).toFixed(1) + "°C";
+            document.getElementById('mixer-temp').innerText = (18 + Math.random() * 4).toFixed(1) + "°C";
+
             updateTankLevel('tank1-bar', 'tank1-label');
+            setTimeout(() => updateTankLevel('tank2-bar', 'tank2-label'), 1000);
         }
 
         function updateTankLevel(barId, labelId) {
@@ -242,3 +284,4 @@
     </script>
 </body>
 </html>
+
