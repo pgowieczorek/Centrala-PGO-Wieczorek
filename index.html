@@ -2,65 +2,99 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Supla Panel</title>
+    <title>Szybki Panel Supla</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f2f5; }
-        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; min-width: 250px; }
-        h2 { color: #666; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
-        #wynik { font-size: 60px; font-weight: bold; color: #00d151; margin: 20px 0; }
-        .status { font-size: 12px; color: #999; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f8f9fa; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); text-align: center; width: 260px; transition: 0.3s; }
+        
+        /* Animacja mignięcia przy odświeżeniu */
+        .refresh-flash { animation: flash-gray 0.5s; }
+        @keyframes flash-gray {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .temp-label { color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .temp-value { font-size: 54px; font-weight: bold; color: #2196f3; margin: 10px 0; }
+        
+        button { background: #4caf50; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
+        button:active { transform: translateY(2px); box-shadow: none; }
+        
+        .footer { font-size: 11px; color: #bbb; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Temperatura</h2>
-    <div id="wynik">...</div>
-    <div id="update" class="status">Inicjalizacja...</div>
-</div>
+    <div class="card" id="temp-card">
+        <div class="temp-label">Aktualna Temperatura</div>
+        <div id="wynik-temp" class="temp-value">--.-°C</div>
+        <div id="last-update" class="footer">Inicjalizacja...</div>
+    </div>
+
+    <div class="card">
+        <button onclick="sterujUrządzeniem()">PRZEŁĄCZ URZĄDZENIE</button>
+        <div id="status-akcji" class="footer">Gotowy</div>
+    </div>
 
 <script>
-    // TWOJE DANE
-    const mojLink = 'https://svr155.supla.org/direct/37/rJ5ahEY67sG_Q6j/read';
-    
-    // Używamy bramki CORS, która rozwiązuje problem "Ładowania..."
-    const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(mojLink);
+    const linkOdczyt = 'https://svr155.supla.org/direct/38/Kicx4jm4qGdAKgNF/read';
+    const linkSterowanie = 'TU_WKLEJ_LINK_DO_STEROWANIA';
 
-    async function pobierzDane() {
-        const wynikDiv = document.getElementById('wynik');
-        const updateDiv = document.getElementById('update');
-        
+    async function pobierzTemp() {
+        const tempElement = document.getElementById('wynik-temp');
+        const cardElement = document.getElementById('temp-card');
+        const updateElement = document.getElementById('last-update');
+
         try {
-            const response = await fetch(proxyUrl);
+            // Unikalny parametr t= sprawia, że proxy nie wysyła starych danych
+            const url = 'https://corsproxy.io/?' + encodeURIComponent(linkOdczyt + '?t=' + Date.now());
             
-            if (!response.ok) throw new Error('Błąd serwera');
+            const res = await fetch(url);
+            const data = await res.json();
             
-            const data = await response.json();
-            console.log("Odebrano:", data);
-
-            // Wyciąganie temperatury (sprawdza różne możliwe nazwy pól)
-            let t = data.temperature ?? data.temp ?? (data.state ? data.state.temp : null) ?? (data.state ? data.state.temperature : null);
+            // Wyciąganie temperatury
+            let t = data.temperature ?? data.temp ?? (data.state ? data.state.temp : null);
 
             if (t !== null) {
-                wynikDiv.innerText = parseFloat(t).toFixed(1) + "°C";
-                updateDiv.innerText = "Aktualizacja: " + new Date().toLocaleTimeString();
-            } else {
-                wynikDiv.innerText = "???";
-                updateDiv.innerText = "Brak pola temperatury w danych";
+                tempElement.innerText = parseFloat(t).toFixed(1) + "°C";
+                updateElement.innerText = "Aktualizacja: " + new Date().toLocaleTimeString();
+                
+                // Efekt wizualny odświeżenia
+                tempElement.classList.remove('refresh-flash');
+                void tempElement.offsetWidth; // Reset animacji
+                tempElement.classList.add('refresh-flash');
             }
-
-        } catch (error) {
-            console.error(error);
-            wynikDiv.innerText = "BŁĄD";
-            updateDiv.innerText = "Problem z połączeniem";
+        } catch (e) {
+            updateElement.innerText = "Błąd połączenia...";
         }
     }
 
-    // Start
-    pobierzDane();
-    // Odświeżaj co 15 sekund
-    setInterval(pobierzDane, 15000);
-</script>
+    async function sterujUrządzeniem() {
+        const status = document.getElementById('status-akcji');
+        status.innerText = "Wysyłanie PATCH...";
+        try {
+            const url = 'https://corsproxy.io/?' + encodeURIComponent(linkSterowanie);
+            const response = await fetch(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'toggle' })
+            });
 
+            if (response.ok) {
+                status.innerText = "Sukces!";
+                // Odśwież temperaturę natychmiast po akcji
+                setTimeout(pobierzTemp, 1000);
+            }
+        } catch (error) {
+            status.innerText = "Błąd sterowania";
+        }
+    }
+
+    // --- KLUCZ: Częste sprawdzanie ---
+    // Pobieraj dane co 5 sekund (5000 ms)
+    setInterval(pobierzTemp, 5000);
+    pobierzTemp(); // Pierwszy start
+</script>
 </body>
 </html>
