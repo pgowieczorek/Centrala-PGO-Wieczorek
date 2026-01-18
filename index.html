@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=1250"> 
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -10,23 +11,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 80px;
+            /* Zmniejszono padding dla mobilnych, by nie marnować miejsca */
+            padding: 20px; 
+            margin: 0;
+            min-width: 1250px; /* Zapewnia, że tło nie "urywa się" */
         }
 
-        /* --- STYL OKNA LOGOWANIA (NAŁOŻONY NA STRONĘ) --- */
+        /* Ulepszenie okna logowania dla dotyku */
         #login-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('20240312_105404.jpg'); /* Zdjęcie w oryginale */
+            width: 100vw;
+            height: 100vh;
+            background: #2c3e50; /* Solidne tło jako fallback */
+            background: url('20240312_105404.jpg');
             background-size: cover;
             background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10000; /* Najwyższa warstwa */
+            z-index: 10000;
         }
 
         .login-box {
@@ -35,35 +40,34 @@
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 320px;
+            width: 350px; /* Nieco szerszy dla wygody kciuków */
             border: 2px solid #ccc;
         }
 
         .login-box input {
             width: 90%;
-            padding: 12px;
-            margin: 10px 0;
+            padding: 15px; /* Większe pole dotykowe */
+            margin: 12px 0;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 18px; /* Zapobiega auto-zoomowi w iOS */
         }
 
         .login-box button {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             background: #2e7d32;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
         }
 
-        /* Ukrycie zawartości pod spodem do czasu zalogowania */
+        /* --- TWOJE ORYGINALNE STYLE (BEZ ZMIAN W WYGLĄDZIE) --- */
         .system-container, h2 { visibility: hidden; }
 
-        /* --- TWOJE ORYGINALNE STYLE (BEZ ZMIAN) --- */
         .system-container {
             position: relative;
             width: 1200px;
@@ -76,6 +80,7 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             overflow: hidden;
+            flex-shrink: 0; /* Zapobiega zgniataniu kontenera */
         }
 
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
@@ -137,17 +142,17 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:#333; margin-bottom:20px;">SYSTEM DOZORU</h2>
-            <input type="text" id="username" placeholder="Użytkownik">
+            <h2 style="color:#333; margin-bottom:20px; visibility: visible;">SYSTEM DOZORU</h2>
+            <input type="text" id="username" placeholder="Użytkownik" spellcheck="false">
             <input type="password" id="password" placeholder="Hasło">
             <button onclick="checkLogin()">ZALOGUJ</button>
-            <p id="login-error" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Błąd autoryzacji!</p>
+            <p id="login-error" style="color: red; font-size: 14px; display: none; margin-top: 10px; font-weight: bold;">Błąd autoryzacji!</p>
         </div>
     </div>
 
-    <h2 style="color: #333; text-align: center;">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
+    <h2 id="main-title" style="color: #333; text-align: center;">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
 
-    <div class="system-container">
+    <div class="system-container" id="main-system">
         <div class="section-label" style="top: 0px;">System Grzewczy</div>
         <div class="device greenhouse"><span style="font-size: 11px;">SZKLARNIA</span><div class="air-temp" id="air-gh">-- °C</div></div>
         <div class="pipe pipe-h p-red" style="width: 130px; left: 340px; top: 110px;"><div class="flow" style="animation-direction: reverse;"></div></div>
@@ -204,7 +209,6 @@
     </div>
 
     <script>
-        // --- KONFIGURACJA SUPLA ---
         const linkSuplaT1 = 'https://svr155.supla.org/direct/39/cDhUT_QcRLegx/read';
 
         async function fetchSuplaTemp() {
@@ -227,14 +231,11 @@
             
             if (u === "admin" && p === "1234") {
                 document.getElementById('login-overlay').style.display = 'none';
-                document.querySelector('.system-container').style.visibility = 'visible';
-                document.querySelector('h2').style.visibility = 'visible';
+                document.getElementById('main-system').style.visibility = 'visible';
+                document.getElementById('main-title').style.visibility = 'visible';
                 
-                // Odświeżanie Supli co 5 sekund
                 setInterval(fetchSuplaTemp, 5000);
                 fetchSuplaTemp();
-
-                // Pozostałe animacje co 3 sekundy
                 setInterval(update, 3000);
                 update();
             } else {
@@ -243,14 +244,11 @@
         }
 
         function update() {
-            // USUNIĘTO air-t1 z losowania, aby Supla miała wyłączność
             document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('air-nursery').innerText = (23 + Math.random() * 3).toFixed(1) + "°C";
             document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
-            
             document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
             document.getElementById('temp-intake-large').innerText = "Temp. dolotu: " + (18 + Math.random() * 6).toFixed(1) + "°C";
-
             document.getElementById('temp-t1-hot').innerText = "T: " + (58 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('temp-t1-cold').innerText = "T: " + (38 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('temp-nursery-hot').innerText = "T: " + (62 + Math.random() * 4).toFixed(1) + "°C";
@@ -259,16 +257,13 @@
             document.getElementById('temp-gh-cold').innerText = "T: " + (42 + Math.random() * 4).toFixed(1) + "°C";
             document.getElementById('temp-t2-hot').innerText = "T: " + (55 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('temp-t2-cold').innerText = "T: " + (35 + Math.random() * 5).toFixed(1) + "°C";
-
             document.getElementById('temp-boiler-large-hot').innerText = "T: " + (75 + Math.random() * 10).toFixed(1) + "°C";
             document.getElementById('temp-boiler-large-cold').innerText = "T: " + (45 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('temp-boiler-small-hot').innerText = "T: " + (70 + Math.random() * 8).toFixed(1) + "°C";
             document.getElementById('temp-boiler-small-cold').innerText = "T: " + (40 + Math.random() * 6).toFixed(1) + "°C";
-
             document.getElementById('tank1-temp').innerText = (12 + Math.random() * 2).toFixed(1) + "°C";
             document.getElementById('tank2-temp').innerText = (13 + Math.random() * 2).toFixed(1) + "°C";
             document.getElementById('mixer-temp').innerText = (18 + Math.random() * 4).toFixed(1) + "°C";
-
             updateTankLevel('tank1-bar', 'tank1-label');
             setTimeout(() => updateTankLevel('tank2-bar', 'tank2-label'), 1000);
         }
@@ -284,4 +279,3 @@
     </script>
 </body>
 </html>
-
