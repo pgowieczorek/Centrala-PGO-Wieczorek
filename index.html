@@ -2,302 +2,64 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>System HVAC i Nawadniania - Gotowy Schemat</title>
+    <title>Mój Panel Supla</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef2f3;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 80px;
-        }
-
-        /* --- STYL OKNA LOGOWANIA --- */
-        #login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('20240312_105404.jpg'); 
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 320px;
-            border: 2px solid #ccc;
-        }
-
-        .login-box input {
-            width: 90%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .login-box button {
-            width: 100%;
-            padding: 12px;
-            background: #2e7d32;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .system-container, h2 { visibility: hidden; }
-
-        /* --- ORYGINALNE STYLE SCHEMATU --- */
-        .system-container {
-            position: relative;
-            width: 1200px;
-            height: 1250px;
-            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
-                        url('20240312_105404.jpg');
-            background-size: cover;
-            background-position: center;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            border: 1px solid #ccc;
-            overflow: hidden;
-        }
-
-        .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
-        .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
-        .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
-        .boiler { background: #37474f; border: 3px solid #263238; }
-        .boiler-small { width: 120px; height: 90px; left: 90px; top: 440px; font-size: 13px; }
-        .boiler-large { width: 210px; height: 170px; left: 120px; top: 680px; font-size: 15px; }
-        .fuel-feeder { background: #455a64; border: 3px solid #37474f; width: 80px; height: 90px; left: -85px; top: 10px; border-radius: 0 0 5px 5px; }
-        .hopper { position: absolute; width: 110px; height: 40px; background: #546e7a; left: -100px; top: -25px; clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%); border-bottom: 2px solid #37474f; z-index: 11; }
-        .fan { background: #90a4ae; border: 2px solid #546e7a; width: 50px; height: 50px; left: -70px; top: 105px; border-radius: 50%; color: #263238; font-size: 9px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 12; }
-        .fan-connector { position: absolute; width: 25px; height: 15px; background: #78909c; border: 2px solid #546e7a; left: -25px; top: 122px; z-index: 5; }
-        .fan-small { left: -60px; top: 55px; width: 40px; height: 40px; font-size: 8px; }
-        .fan-connector-small { left: -22px; top: 68px; width: 22px; height: 12px; background: #fb8c00; border: 2px solid #ef6c00; }
-        .fan-blade { position: absolute; width: 80%; height: 80%; border: 4px dashed #37474f; border-radius: 50%; animation: spin 2s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .chimney { position: absolute; width: 30px; height: 100px; background: linear-gradient(to right, #444, #777, #444); border: 2px solid #222; border-radius: 3px 3px 0 0; z-index: 5; }
-        .chimney-cap { position: absolute; width: 40px; height: 8px; background: #222; top: -5px; left: -7px; border-radius: 2px; }
-        .manifold { position: absolute; width: 35px; height: 520px; border-radius: 10px; z-index: 20; display: flex; align-items: center; justify-content: center; }
-        .manifold-supply { background: linear-gradient(to right, #b71c1c, #ff5252, #b71c1c); left: 450px; top: 40px; }
-        .manifold-return { background: linear-gradient(to right, #0d47a1, #448aff, #0d47a1); left: 550px; top: 40px; }
-        .tunnel { background: #2e7d32; border: 3px solid #1b5e20; width: 380px; height: 250px; z-index: 10; overflow: hidden; }
-        .tunnel-1 { left: 700px; top: 30px; }
-        .tunnel-2 { left: 700px; top: 290px; }
-        .nursery-zone { position: absolute; top: 0; left: 0; width: 100%; height: 20%; background: rgba(255, 255, 255, 0.15); border-bottom: 2px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center; justify-content: space-around; padding: 0 10px; box-sizing: border-box; z-index: 5; }
-        .pipe { position: absolute; background: #eee; z-index: 5; overflow: hidden; }
-        .pipe-h { height: 12px; }
-        .pipe-v { width: 12px; }
-        .flow { position: absolute; width: 200%; height: 100%; background-size: 30px 100%; }
-        .v-flow { position: absolute; width: 100%; height: 200%; background-size: 100% 30px; }
-        .p-red .flow { background-image: linear-gradient(90deg, #ff5252 50%, #b71c1c 50%); animation: flow-right 0.8s linear infinite; }
-        .p-blue .flow { background-image: linear-gradient(90deg, #448aff 50%, #0d47a1 50%); animation: flow-left 0.8s linear infinite; }
-        .p-red .v-flow { background-image: linear-gradient(0deg, #ff5252 50%, #b71c1c 50%); animation: flow-up 0.8s linear infinite; }
-        .p-blue .v-flow { background-image: linear-gradient(0deg, #448aff 50%, #0d47a1 50%); animation: flow-up 0.8s linear infinite; }
-        .p-water .flow { background-image: linear-gradient(90deg, #81d4fa 50%, #0288d1 50%); animation: flow-right 1.2s linear infinite; }
-        .p-water .v-flow { background-image: linear-gradient(0deg, #81d4fa 50%, #0288d1 50%); animation: flow-up 1.2s linear infinite; }
-        @keyframes flow-right { from { transform: translateX(-30px); } to { transform: translateX(0); } }
-        @keyframes flow-left { from { transform: translateX(0); } to { transform: translateX(-30px); } }
-        @keyframes flow-up { from { transform: translateY(0); } to { transform: translateY(-30px); } }
-        .air-temp { background: #222; color: #ff9800; padding: 5px 10px; border: 2px solid #ff9800; border-radius: 5px; font-size: 18px; margin-top: 10px; }
-        .air-temp-mini { background: #222; color: #00e5ff; padding: 2px 6px; border: 1px solid #00e5ff; border-radius: 4px; font-size: 14px; font-weight: bold; }
-        .water-temp { background: rgba(0, 0, 0, 0.6); color: #00d2ff; padding: 2px 8px; border: 1px solid #00d2ff; border-radius: 4px; font-size: 12px; margin-top: 5px; }
-        .pipe-sensor { position: absolute; background: rgba(0, 0, 0, 0.8); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; z-index: 25; white-space: nowrap; }
-        .sensor-hot { color: #ff5252; border: 1px solid #ff5252; }
-        .sensor-cold { color: #448aff; border: 1px solid #448aff; }
-        .sensor-exhaust { color: #ff9800; border: 1px solid #ff9800; background: rgba(34, 34, 34, 0.9); }
-        .sensor-intake { color: #00e5ff; border: 1px solid #00e5ff; background: rgba(0, 0, 0, 0.8); }
-        .tank { background: #0277bd; border: 3px solid #01579b; border-radius: 15px; display: flex; flex-direction: row; padding: 10px; box-sizing: border-box; }
-        .tank-info { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .level-group { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; margin-left: 10px; }
-        .vertical-level-container { width: 25px; height: 130px; background: #1a237e; border: 2px solid #fff; border-radius: 5px; position: relative; display: flex; flex-direction: column-reverse; overflow: hidden; }
-        .level-bar-v { width: 100%; height: 0%; transition: height 0.5s, background-color 0.5s; }
-        .level-label-v { font-size: 10px; color: #fff; margin-top: 5px; font-weight: bold; width: 50px; text-align: center; }
-        .mixer { background: #455a64; border: 4px solid #263238; width: 126px; height: 126px; border-radius: 50%; font-size: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .valve { background: #fb8c00; border: 2px solid #ef6c00; width: 50px; height: 50px; border-radius: 6px; font-size: 12px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #eceff1; }
+        .card { background: white; padding: 30px; border-radius: 15px; shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; border-top: 5px solid #00d151; }
+        h2 { color: #555; margin-bottom: 10px; }
+        #wynik { font-size: 48px; font-weight: bold; color: #222; margin: 0; }
+        .unit { font-size: 24px; color: #888; }
     </style>
 </head>
 <body>
 
-    <div id="login-overlay">
-        <div class="login-box">
-            <h2 style="color:#333; margin-bottom:20px; visibility: visible;">SYSTEM DOZORU</h2>
-            <input type="text" id="username" placeholder="Użytkownik">
-            <input type="password" id="password" placeholder="Hasło">
-            <button onclick="checkLogin()">ZALOGUJ</button>
-            <p id="login-error" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Błąd autoryzacji!</p>
-        </div>
-    </div>
+<div class="card">
+    <h2>Temperatura</h2>
+    <p id="wynik">Ładowanie...</p>
+</div>
 
-    <h2 style="color: #333; text-align: center;">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
+<script>
+    // WKLEJ SWÓJ LINK PONIŻEJ (pamiętaj o /read na końcu)
+    const url = 'TWÓJ_LINK_Z_SUPLI_Z_READ_NA_KONCU';
 
-    <div class="system-container">
-        <div class="section-label" style="top: 0px;">System Grzewczy</div>
-        <div class="device greenhouse"><span style="font-size: 11px;">SZKLARNIA</span><div class="air-temp" id="air-gh">-- °C</div></div>
-        <div class="pipe pipe-h p-red" style="width: 130px; left: 340px; top: 110px;"><div class="flow" style="animation-direction: reverse;"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 350px; top: 92px; font-size: 10px;" id="temp-gh-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 230px; left: 340px; top: 130px;"><div class="flow" style="animation-direction: reverse;"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 350px; top: 142px; font-size: 10px;" id="temp-gh-cold">T: -- °C</div>
-        
-        <div class="device boiler boiler-small"><div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">Mały Kocioł<br> 0,6 MW<div class="chimney" style="left: 100px; top: -60px;"><div class="chimney-cap"></div><div style="position: absolute; top: -50px; left: 5px; color: #aaa; font-size: 40px; opacity: 0.8;">☁</div></div><div class="device fan fan-small" style="background: #fb8c00; border-color: #ef6c00;"><div class="fan-blade"></div>PALNIK</div><div class="fan-connector fan-connector-small"></div></div></div>
-        
-        <div class="pipe pipe-h p-red" style="width: 270px; left: 180px; top: 490px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 230px; top: 470px;" id="temp-boiler-small-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 370px; left: 180px; top: 510px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 230px; top: 520px;" id="temp-boiler-small-cold">T: -- °C</div>
-        
-        <div class="chimney" style="left: 330px; top: 620px;"><div class="chimney-cap"></div><div style="position: absolute; top: -50px; left: 5px; color: #aaa; font-size: 40px; opacity: 0.8;">☁</div></div>
-        <div class="pipe-sensor sensor-exhaust" style="left: 198px; top: 645px;" id="temp-exhaust-large">Temp. spalin: -- °C</div>
-        
-        <div class="device boiler boiler-large"><div style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">Kocioł Duży<br> 1.0 MW<div class="hopper"></div><div class="device fuel-feeder"><span style="font-size: 9px; margin-top: 5px;">ZASYP</span><div style="width: 60%; height: 15%; background: #111; margin-top: auto; margin-bottom: 10px; border-radius: 2px;"></div></div><div class="device fan"><div class="fan-blade"></div>WENT.</div><div class="fan-connector"></div><div class="pipe-sensor sensor-intake" style="left: 5px; top: 122px;" id="temp-intake-large">Temp. dolotu: -- °C</div></div></div>
-        
-        <div class="pipe pipe-h p-red" style="width: 142px; left: 330px; top: 780px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 345px; top: 760px;" id="temp-boiler-large-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 242px; left: 330px; top: 800px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 345px; top: 810px;" id="temp-boiler-large-cold">T: -- °C</div>
-        
-        <div class="pipe pipe-v p-red" style="height: 220px; left: 460px; top: 560px;"><div class="v-flow"></div></div>
-        <div class="pipe pipe-v p-blue" style="height: 240px; left: 560px; top: 560px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
-        
-        <div class="manifold manifold-supply"><div style="writing-mode: vertical-rl; transform: rotate(180deg); color: white;">KOLEKTOR - ZASILANIE</div></div>
-        <div class="manifold manifold-return"><div style="writing-mode: vertical-rl; transform: rotate(180deg); color: white;">KOLEKTOR - POWRÓT</div></div>
-        
-        <div class="device tunnel tunnel-1">
-            <div class="nursery-zone"><span style="font-size: 10px; color: #fff;">ROZSADNIK</span><div class="air-temp-mini" id="air-nursery">-- °C</div></div>
-            <span style="font-size: 11px; margin-top: 40px;">OBIEKT PRZÓD</span>
-            <div class="air-temp" id="air-t1">-- °C</div> 
-        </div>
-
-        <div class="pipe pipe-h p-red" style="width: 215px; left: 485px; top: 45px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 27px; font-size: 10px;" id="temp-nursery-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 115px; left: 585px; top: 65px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 77px; font-size: 10px;" id="temp-nursery-cold">T: -- °C</div>
-        
-        <div class="pipe pipe-h p-red" style="width: 365px; left: 485px; top: 200px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 180px;" id="temp-t1-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 265px; left: 585px; top: 220px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 230px;" id="temp-t1-cold">T: -- °C</div>
-        
-        <div class="device tunnel tunnel-2"><span style="font-size: 11px;">OBIEKT TYŁ</span><div class="air-temp" id="air-t2">-- °C</div></div>
-        
-        <div class="pipe pipe-h p-red" style="width: 374px; left: 476px; top: 340px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-hot" style="left: 485px; top: 320px;" id="temp-t2-hot">T: -- °C</div>
-        <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="flow"></div></div>
-        <div class="pipe-sensor sensor-cold" style="left: 585px; top: 370px;" id="temp-t2-cold">T: -- °C</div>
-
-        <div class="section-label" style="top: 900px;">System Nawadniania</div>
-        <div class="device tank" style="left: 30px; width: 200px; height: 190px; top: 980px;"><div class="tank-info"><span style="font-size: 11px;">ZBIORNIK WODY<br>20.000 L</span><div class="water-temp" id="tank1-temp">-- °C</div></div><div class="level-group"><div class="vertical-level-container"><div id="tank1-bar" class="level-bar-v"></div></div><div id="tank1-label" class="level-label-v">--</div></div></div>
-        <div class="pipe pipe-h p-water" style="width: 60px; left: 230px; top: 1066px;"><div class="flow"></div></div>
-        <div class="device tank" style="left: 290px; height: 160px; top: 1010px; width: 180px;"><div class="tank-info"><span style="font-size: 11px;">PODGRZEWACZ<br>2.000 L</span><div class="water-temp" id="tank2-temp">-- °C</div></div><div class="level-group"><div class="vertical-level-container" style="height: 100px;"><div id="tank2-bar" class="level-bar-v"></div></div><div id="tank2-label" class="level-label-v">--</div></div></div>
-        <div class="pipe pipe-h p-water" style="width: 70px; left: 470px; top: 1066px;"><div class="flow"></div></div>
-        <div class="device mixer" style="left: 540px; top: 1009px;">MIESZALNIK<div class="water-temp" id="mixer-temp" style="font-size: 14px;">-- °C</div></div>
-        <div class="pipe pipe-h p-water" style="width: 95px; left: 666px; top: 1066px;"><div class="flow"></div></div>
-        <div class="device valve" style="left: 730px; top: 990px;">Z2</div>
-        <div class="device valve" style="left: 730px; top: 1110px;">Z1</div>
-        <div class="pipe pipe-v p-water" style="height: 50px; left: 751px; top: 1025px;"><div class="v-flow"></div></div>
-        <div class="pipe pipe-v p-water" style="height: 56px; left: 751px; top: 1074px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
-        <div class="pipe pipe-h p-water" style="width: 360px; left: 780px; top: 1011px;"><div class="flow"></div></div>
-        <div class="pipe pipe-v p-water" style="height: 673px; left: 1140px; top: 350px;"><div class="v-flow"></div></div>
-        <div class="pipe pipe-h p-water" style="width: 110px; left: 1030px; top: 350px;"><div class="flow" style="animation-direction: reverse;"></div></div>
-        <div class="pipe pipe-h p-water" style="width: 400px; left: 780px; top: 1131px;"><div class="flow"></div></div>
-        <div class="pipe pipe-v p-water" style="height: 1023px; left: 1180px; top: 120px;"><div class="v-flow"></div></div>
-        <div class="pipe pipe-h p-water" style="width: 150px; left: 1030px; top: 120px;"><div class="flow" style="animation-direction: reverse;"></div></div>
-    </div>
-
-    <script>
-        // --- KONFIGURACJA SUPLA ---
-        // WKLEJ SWÓJ LINK POMIĘDZY CUDZYSŁOWY PONIŻEJ
-        const suplaUrl = 'https://svr155.supla.org/direct/37/rJ5ahEY67sG_Q6j/read';
-
-        async function fetchSuplaData() {
-            try {
-                const response = await fetch(suplaUrl);
-                const data = await response.json();
-                
-                // Jeśli Supla zwraca obiekt z polem temperature
-                if (data && typeof data.temperature !== 'undefined') {
-                    document.getElementById('air-t1').innerText = data.temperature.toFixed(1) + "°C";
-                }
-            } catch (error) {
-                console.error('Błąd pobierania danych Supla:', error);
-            }
-        }
-
-        function checkLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+    async function pobierzDane() {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
             
-            if (u === "admin" && p === "1234") {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.querySelector('.system-container').style.visibility = 'visible';
-                document.querySelector('h2').style.visibility = 'visible';
-                
-                // Odświeżanie co 3 sekundy
-                setInterval(update, 3000);
-                update();
+            // Logowanie do konsoli (możesz sprawdzić pod F12 co dokładnie przychodzi)
+            console.log("Dane z Supli:", data);
+
+            let temp = null;
+
+            // Szukanie temperatury w różnych miejscach (zależnie od typu czujnika)
+            if (data.temperature !== undefined) {
+                temp = data.temperature;
+            } else if (data.state && data.state.temp !== undefined) {
+                temp = data.state.temp;
+            } else if (data.state && data.state.temperature !== undefined) {
+                temp = data.state.temperature;
+            } else if (data.channel && data.channel.state.temp !== undefined) {
+                temp = data.channel.state.temp;
+            }
+
+            if (temp !== null) {
+                // Zaokrąglanie do 1 miejsca po przecinku
+                document.getElementById('wynik').innerHTML = parseFloat(temp).toFixed(1) + '<span class="unit">°C</span>';
             } else {
-                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('wynik').innerText = "Brak odczytu";
             }
+
+        } catch (error) {
+            console.error("Błąd:", error);
+            document.getElementById('wynik').innerText = "Błąd!";
         }
+    }
 
-        function update() {
-            // Pobieranie danych z Supli dla Obiektu Przód
-            fetchSuplaData();
+    // Pobierz dane raz, a potem co 10 sekund
+    pobierzDane();
+    setInterval(pobierzDane, 10000);
+</script>
 
-            // Reszta danych symulowanych (zgodnie z oryginałem)
-            document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('air-nursery').innerText = (23 + Math.random() * 3).toFixed(1) + "°C";
-            document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
-            
-            document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
-            document.getElementById('temp-intake-large').innerText = "Temp. dolotu: " + (18 + Math.random() * 6).toFixed(1) + "°C";
-
-            document.getElementById('temp-t1-hot').innerText = "T: " + (58 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('temp-t1-cold').innerText = "T: " + (38 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('temp-nursery-hot').innerText = "T: " + (62 + Math.random() * 4).toFixed(1) + "°C";
-            document.getElementById('temp-nursery-cold').innerText = "T: " + (45 + Math.random() * 4).toFixed(1) + "°C";
-            document.getElementById('temp-gh-hot').innerText = "T: " + (60 + Math.random() * 4).toFixed(1) + "°C";
-            document.getElementById('temp-gh-cold').innerText = "T: " + (42 + Math.random() * 4).toFixed(1) + "°C";
-            document.getElementById('temp-t2-hot').innerText = "T: " + (55 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('temp-t2-cold').innerText = "T: " + (35 + Math.random() * 5).toFixed(1) + "°C";
-
-            document.getElementById('temp-boiler-large-hot').innerText = "T: " + (75 + Math.random() * 10).toFixed(1) + "°C";
-            document.getElementById('temp-boiler-large-cold').innerText = "T: " + (45 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('temp-boiler-small-hot').innerText = "T: " + (70 + Math.random() * 8).toFixed(1) + "°C";
-            document.getElementById('temp-boiler-small-cold').innerText = "T: " + (40 + Math.random() * 6).toFixed(1) + "°C";
-
-            document.getElementById('tank1-temp').innerText = (12 + Math.random() * 2).toFixed(1) + "°C";
-            document.getElementById('tank2-temp').innerText = (13 + Math.random() * 2).toFixed(1) + "°C";
-            document.getElementById('mixer-temp').innerText = (18 + Math.random() * 4).toFixed(1) + "°C";
-
-            updateTankLevel('tank1-bar', 'tank1-label');
-            setTimeout(() => updateTankLevel('tank2-bar', 'tank2-label'), 1000);
-        }
-
-        function updateTankLevel(barId, labelId) {
-            const bar = document.getElementById(barId);
-            const label = document.getElementById(labelId);
-            const roll = Math.floor(Math.random() * 3);
-            if (roll === 0) { bar.style.height = "15%"; bar.style.backgroundColor = "#ff5252"; label.innerText = "POZIOM PUSTY"; }
-            else if (roll === 1) { bar.style.height = "50%"; bar.style.backgroundColor = "#ffd740"; label.innerText = "POZIOM ŚREDNI"; }
-            else { bar.style.height = "100%"; bar.style.backgroundColor = "#69f0ae"; label.innerText = "POZIOM PEŁNY"; }
-        }
-    </script>
 </body>
 </html>
-
