@@ -119,8 +119,8 @@
         .p-blue .flow { background-image: linear-gradient(90deg, #448aff 50%, #0d47a1 50%); animation: flow-left 0.8s linear infinite; }
         .p-red .v-flow { background-image: linear-gradient(0deg, #ff5252 50%, #b71c1c 50%); animation: flow-up 0.8s linear infinite; }
         .p-blue .v-flow { background-image: linear-gradient(0deg, #448aff 50%, #0d47a1 50%); animation: flow-up 0.8s linear infinite; }
-        .p-water .flow { background-image: linear-gradient(90deg, #81d4fa 95%, #0288d1 5%); animation: flow-right 0.2s linear infinite; }
-        .p-water .v-flow { background-image: linear-gradient(0deg, #81d4fa 95%, #0288d1 5%); animation: flow-up 0.2s linear infinite; }
+        .p-water .flow { background-image: linear-gradient(90deg, #81d4fa 50%, #0288d1 50%); animation: flow-right 1.2s linear infinite; }
+        .p-water .v-flow { background-image: linear-gradient(0deg, #81d4fa 50%, #0288d1 50%); animation: flow-up 1.2s linear infinite; }
         @keyframes flow-right { from { transform: translateX(-30px); } to { transform: translateX(0); } }
         @keyframes flow-left { from { transform: translateX(0); } to { transform: translateX(-30px); } }
         @keyframes flow-up { from { transform: translateY(0); } to { transform: translateY(-30px); } }
@@ -336,9 +336,9 @@
     <script>
         // --- KONFIGURACJA LINKÓW SUPLA ---
         
-        const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
+        const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
+        const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
 
         const L_PRZOD_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_PRZOD_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
@@ -469,7 +469,7 @@
                 
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(update, 3000); update();
-                setInterval(updateValvesAnimation, 3000); updateValvesAnimation();
+                setInterval(updateValvesAnimation, 5000); updateValvesAnimation();
                 setInterval(updateModalTemperatures, 10000);
 
                 setInterval(() => {
@@ -507,12 +507,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
