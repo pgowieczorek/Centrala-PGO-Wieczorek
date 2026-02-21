@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1250"> 
+    <meta name="viewport" content="width=1250">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -11,7 +11,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px; 
+            padding: 20px;
             margin: 0;
             min-width: 1250px;
         }
@@ -69,7 +69,7 @@
             position: relative;
             width: 1200px;
             height: 1250px;
-            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), 
+            background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
                         url('20240312_105404.jpg');
             background-size: cover;
             background-position: center;
@@ -103,11 +103,11 @@
         .tunnel-1 { left: 700px; top: 30px; }
         .tunnel-2 { left: 700px; top: 290px; }
         
-        .nursery-zone { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 20%; 
-            background: rgba(255, 255, 255, 0.15); border-bottom: 2px solid rgba(255, 255, 255, 0.4); 
-            display: flex; align-items: center; justify-content: flex-start; padding: 0 10px; 
-            box-sizing: border-box; z-index: 5; 
+        .nursery-zone {
+            position: absolute; top: 0; left: 0; width: 100%; height: 20%;
+            background: rgba(255, 255, 255, 0.15); border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+            display: flex; align-items: center; justify-content: flex-start; padding: 0 10px;
+            box-sizing: border-box; z-index: 5;
         }
 
         .pipe { position: absolute; background: #eee; z-index: 5; overflow: hidden; }
@@ -152,14 +152,14 @@
             z-index: 15;
         }
         .sub-station:hover { background: rgba(255,255,255,0.25); border-color: #fff; }
-        .pump-icon { 
-            width: 42px; height: 42px; background: #333; border: 3px solid #666; 
+        .pump-icon {
+            width: 42px; height: 42px; background: #333; border: 3px solid #666;
             border-radius: 50%; position: relative; box-shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
         .pump-icon::after { content: 'P'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; font-weight: bold; }
-        .valve-3d { 
-            width: 34px; height: 34px; background: #fb8c00; border: 2px solid #ef6c00; 
-            margin-top: 12px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); 
+        .valve-3d {
+            width: 34px; height: 34px; background: #fb8c00; border: 2px solid #ef6c00;
+            margin-top: 12px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
@@ -251,7 +251,7 @@
         
         <div class="device tunnel tunnel-1">
             <div class="nursery-zone">
-                <div class="sub-station" onclick="event.stopPropagation(); toggleWindow('ROZSADNIK')" 
+                <div class="sub-station" onclick="event.stopPropagation(); toggleWindow('ROZSADNIK')"
                      style="position: relative; left: 0; top: 0; width: 110px; height: 35px; flex-direction: row; border: 1px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.2); border-radius: 5px; padding: 2px;">
                     <div class="pump-icon" style="width: 22px; height: 22px; border-width: 2px;"></div>
                     <div class="valve-3d" style="width: 18px; height: 18px; margin: 0 5px; transform: rotate(90deg);"></div>
@@ -336,6 +336,9 @@
     <script>
         // --- KONFIGURACJA LINKÓW SUPLA ---
         
+        // NOWY LINK DLA OKNA ROZSADNIKA (Temp. powietrza):
+        const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
+
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
         const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
@@ -413,6 +416,20 @@
             } catch (e) { console.error("Błąd Supla T1"); }
         }
 
+        // FUNKCJA DLA TEMPERATURY POWIETRZA W ROZSADNIKU
+        async function fetchAirNursery() {
+            try {
+                const res = await fetch(buildUrl(L_AIR_NURSERY_TEMP));
+                const data = await res.json();
+                let t = data.temperature ?? data.temp ?? data.state?.temp;
+                if (t !== null && t !== undefined) {
+                    document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C";
+                }
+            } catch (e) { 
+                console.error("Błąd pobierania temperatury powietrza Rozsadnik"); 
+            }
+        }
+
         let toggleState = false;
         function updateValvesAnimation() {
             const v1 = document.getElementById('valve-z1');
@@ -442,8 +459,8 @@
                 const isMaxHigh = (resMax.hi === true || resMax.hi === "true");
                 const bar = document.getElementById(barId);
                 const label = document.getElementById(labelId);
-                if (isMaxHigh) { bar.style.height = '90%'; bar.style.backgroundColor = "#238636"; label.innerText = "MAX"; } 
-                else if (isMinHigh) { bar.style.height = '50%'; bar.style.backgroundColor = "#0095ff"; label.innerText = "ŚREDNI"; } 
+                if (isMaxHigh) { bar.style.height = '90%'; bar.style.backgroundColor = "#238636"; label.innerText = "MAX"; }
+                else if (isMinHigh) { bar.style.height = '50%'; bar.style.backgroundColor = "#0095ff"; label.innerText = "ŚREDNI"; }
                 else { bar.style.height = '15%'; bar.style.backgroundColor = "#da3633"; label.innerText = "ALARM"; }
             } catch (err) { document.getElementById(labelId).innerText = "BŁĄD"; }
         }
@@ -454,7 +471,7 @@
                 const isHigh = (res.hi === true || res.hi === "true");
                 const bar = document.getElementById(barId);
                 const label = document.getElementById(labelId);
-                if (isHigh) { bar.style.height = '80%'; bar.style.backgroundColor = "#238636"; label.innerText = "NORMA"; } 
+                if (isHigh) { bar.style.height = '80%'; bar.style.backgroundColor = "#238636"; label.innerText = "NORMA"; }
                 else { bar.style.height = '15%'; bar.style.backgroundColor = "#da3633"; label.innerText = "ALARM"; }
             } catch (err) { document.getElementById(labelId).innerText = "BŁĄD"; }
         }
@@ -468,6 +485,7 @@
                 document.getElementById('main-title').style.visibility = 'visible';
                 
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
+                setInterval(fetchAirNursery, 5000); fetchAirNursery(); // Aktywacja pobierania temp rozsadnika
                 setInterval(update, 3000); update();
                 setInterval(updateValvesAnimation, 5000); updateValvesAnimation();
                 setInterval(updateModalTemperatures, 10000);
@@ -484,7 +502,7 @@
 
         function update() {
             document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
-            document.getElementById('air-nursery').innerText = (23 + Math.random() * 3).toFixed(1) + "°C";
+            // LINIJA ODPOWIEDZIALNA ZA LOSOWANIE ROZSADNIKA ZOSTAŁA USUNIĘTA
             document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
             document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
             document.getElementById('temp-intake-large').innerText = "Temp. dolotu: " + (18 + Math.random() * 6).toFixed(1) + "°C";
