@@ -13,11 +13,9 @@
             align-items: center;
             padding: 0;
             margin: 0;
-            /* Usunięto min-width, aby umożliwić zwężanie strony */
             overflow-x: hidden;
         }
 
-        /* --- Zmiany dla mobilności --- */
         .system-wrapper {
             width: 100%;
             display: flex;
@@ -34,7 +32,6 @@
             margin: 10px 0;
         }
 
-        /* Ulepszony box logowania */
         .login-box {
             background: white;
             padding: 40px;
@@ -45,7 +42,6 @@
             max-width: 350px;
             border: 2px solid #ccc;
         }
-        /* ----------------------------- */
 
         #login-overlay {
             position: fixed;
@@ -96,11 +92,9 @@
             border: 1px solid #ccc;
             overflow: hidden;
             flex-shrink: 0;
-            /* Zapewnia skalowanie od środka góry */
             transform-origin: top center;
         }
 
-        /* Reszta stylów pozostaje identyczna jak w oryginale */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -330,23 +324,28 @@
             const pageWrapper = document.getElementById('page-wrapper');
             const title = document.getElementById('main-title');
             const screenWidth = window.innerWidth;
-            const baseWidth = 1200; // Stała szerokość Twojego projektu
+            const baseWidth = 1200; 
 
-            if (screenWidth < baseWidth + 40) { // +40 dla marginesów
+            // Automatyczne dopasowanie do szerokości okna
+            if (screenWidth < baseWidth + 40) { 
                 const scale = (screenWidth - 20) / baseWidth;
                 container.style.transform = `scale(${scale})`;
+                container.style.webkitTransform = `scale(${scale})`;
                 
-                // Dostosowanie nagłówka
                 title.style.fontSize = Math.max(16, 30 * scale) + "px";
-                
-                // Korekta wysokości strony, aby nie było pustego miejsca pod spodem
                 pageWrapper.style.height = (1250 * scale + 150) + "px";
             } else {
                 container.style.transform = 'scale(1)';
+                container.style.webkitTransform = 'scale(1)';
                 title.style.fontSize = "30px";
                 pageWrapper.style.height = "auto";
             }
         }
+
+        // WYWOŁANIE NATYCHMIASTOWE PO ZAŁADOWANIU I PRZY ZMIANIE ROZMIARU
+        window.addEventListener('DOMContentLoaded', handleResize);
+        window.addEventListener('load', handleResize);
+        window.addEventListener('resize', handleResize);
 
         // --- KONFIGURACJA LINKÓW SUPLA (BEZ ZMIAN) ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
@@ -464,14 +463,13 @@
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             if (u === "admin" && p === "1234") {
+                // Wywołanie dopasowania rozmiaru natychmiast po zalogowaniu
+                handleResize();
+
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
-                // Inicjalizacja skalowania po zalogowaniu
-                handleResize();
-                window.addEventListener('resize', handleResize);
-
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
