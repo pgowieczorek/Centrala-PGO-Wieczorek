@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -13,7 +13,7 @@
             align-items: center;
             padding: 0;
             margin: 0;
-            overflow-x: hidden;
+            overflow-x: hidden; /* Zapobiega przewijaniu na boki */
         }
 
         .system-wrapper {
@@ -22,6 +22,7 @@
             flex-direction: column;
             align-items: center;
             transform-origin: top center;
+            transition: height 0.3s ease;
         }
 
         #main-title {
@@ -30,6 +31,7 @@
             transition: font-size 0.3s;
             padding: 10px;
             margin: 10px 0;
+            z-index: 100;
         }
 
         .login-box {
@@ -77,11 +79,12 @@
             font-size: 18px;
         }
 
-        .system-container, h2 { visibility: hidden; }
+        /* Widoczność kontrolowana przez JS po zalogowaniu */
+        .system-container, h2#main-title { visibility: hidden; }
 
         .system-container {
             position: relative;
-            width: 1200px;
+            width: 1200px; /* Stała szerokość bazowa dla współrzędnych elementów */
             height: 1250px;
             background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
                         url('20240312_105404.jpg');
@@ -90,11 +93,12 @@
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
-            overflow: hidden;
             flex-shrink: 0;
-            transform-origin: top center;
+            transform-origin: top center; /* Kluczowe dla poprawnego skalowania */
+            margin-bottom: 50px;
         }
 
+        /* --- TWOJE ORYGINALNE STYLE ELEMENTÓW --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -276,7 +280,7 @@
 
             <div class="pipe pipe-h p-red" style="width: 374px; left: 476px; top: 340px;"><div class="flow"></div></div>
             <div class="pipe-sensor sensor-hot" style="left: 485px; top: 320px;" id="temp-t2-hot">T: -- °C</div>
-            <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="flow"></div></div>
+            <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
             <div class="pipe-sensor sensor-cold" style="left: 585px; top: 370px;" id="temp-t2-cold">T: -- °C</div>
 
             <div class="section-label" style="top: 900px;">System Nawadniania</div>
@@ -318,46 +322,45 @@
     </div>
 
     <script>
-        // --- FUNKCJA RESPONSYWNOŚCI ---
+        // --- FUNKCJA RESPONSYWNOŚCI (POPRAWIONA) ---
         function handleResize() {
             const container = document.getElementById('main-system');
             const pageWrapper = document.getElementById('page-wrapper');
             const title = document.getElementById('main-title');
             const screenWidth = window.innerWidth;
             const baseWidth = 1200; 
+            const baseHeight = 1250;
 
-            // Automatyczne dopasowanie do szerokości okna
-            if (screenWidth < baseWidth + 40) { 
-                const scale = (screenWidth - 20) / baseWidth;
-                container.style.transform = `scale(${scale})`;
-                container.style.webkitTransform = `scale(${scale})`;
-                
-                title.style.fontSize = Math.max(16, 30 * scale) + "px";
-                pageWrapper.style.height = (1250 * scale + 150) + "px";
+            // Obliczamy skalę na podstawie szerokości okna z lekkim marginesem
+            let scale = (screenWidth - 20) / baseWidth;
+            
+            // Na komputerach nie powiększamy powyżej 100%
+            if (scale > 1) scale = 1;
+
+            // Skalujemy schemat
+            container.style.transform = `scale(${scale})`;
+            container.style.webkitTransform = `scale(${scale})`;
+            
+            // Dynamicznie dostosowujemy wysokość wrapper-a, aby nie było dziury pod spodem
+            // 150 to zapas na tytuł i marginesy
+            pageWrapper.style.height = (baseHeight * scale + 150) + "px";
+
+            // Zmniejszamy czcionkę tytułu na komórkach
+            if (screenWidth < 600) {
+                title.style.fontSize = "18px";
             } else {
-                container.style.transform = 'scale(1)';
-                container.style.webkitTransform = 'scale(1)';
                 title.style.fontSize = "30px";
-                pageWrapper.style.height = "auto";
             }
         }
 
-        // WYWOŁANIE NATYCHMIASTOWE PO ZAŁADOWANIU I PRZY ZMIANIE ROZMIARU
-        window.addEventListener('DOMContentLoaded', handleResize);
         window.addEventListener('load', handleResize);
         window.addEventListener('resize', handleResize);
 
-        // --- KONFIGURACJA LINKÓW SUPLA (BEZ ZMIAN) ---
+        // --- KONFIGURACJA LINKÓW SUPLA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
         const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
-        const L_PRZOD_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_PRZOD_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_PRZOD_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_TYL_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_TYL_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-        const L_TYL_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const linkSuplaT1 = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const LINK_MIN = 'https://svr155.supla.org/direct/41/pbYMmDddH2cK8/read';
         const LINK_MAX = 'https://svr155.supla.org/direct/42/NbHLE2_bbP4e/read';
@@ -386,8 +389,7 @@
 
         async function updateModalTemperatures() {
             if (!activeZone) return;
-            let urls = (activeZone === 'ROZSADNIK') ? [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA] : 
-                       (activeZone === 'PRZÓD') ? [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA] : [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
+            let urls = (activeZone === 'ROZSADNIK') ? [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA] : [linkSuplaT1, linkSuplaT1, linkSuplaT1];
             const sensorIds = ['modal-temp-red', 'modal-temp-blue', 'modal-temp-pump'];
             for (let i = 0; i < urls.length; i++) {
                 try {
@@ -463,13 +465,12 @@
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             if (u === "admin" && p === "1234") {
-                // Wywołanie dopasowania rozmiaru natychmiast po zalogowaniu
-                handleResize();
-
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
+                handleResize(); // Uruchomienie skalowania zaraz po zalogowaniu
+
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
