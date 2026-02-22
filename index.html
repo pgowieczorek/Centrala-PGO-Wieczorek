@@ -2,9 +2,10 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
+        /* Twoje oryginalne style pozostają bez zmian */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #eef2f3;
@@ -13,7 +14,7 @@
             align-items: center;
             padding: 0;
             margin: 0;
-            overflow-x: hidden; /* Zapobiega przewijaniu na boki */
+            overflow-x: hidden;
         }
 
         .system-wrapper {
@@ -79,12 +80,11 @@
             font-size: 18px;
         }
 
-        /* Widoczność kontrolowana przez JS po zalogowaniu */
         .system-container, h2#main-title { visibility: hidden; }
 
         .system-container {
             position: relative;
-            width: 1200px; /* Stała szerokość bazowa dla współrzędnych elementów */
+            width: 1200px; 
             height: 1250px;
             background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
                         url('20240312_105404.jpg');
@@ -94,11 +94,11 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             flex-shrink: 0;
-            transform-origin: top center; /* Kluczowe dla poprawnego skalowania */
+            transform-origin: top center; 
             margin-bottom: 50px;
         }
 
-        /* --- TWOJE ORYGINALNE STYLE ELEMENTÓW --- */
+        /* --- STYLE ELEMENTÓW (Twoje oryginalne) --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -160,6 +160,7 @@
         .pump-icon::after { content: 'P'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; font-weight: bold; }
         .valve-3d { width: 34px; height: 34px; background: #fb8c00; border: 2px solid #ef6c00; margin-top: 12px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
+        /* OKNO MODALNE (Schemat Węzła) */
         #custom-window {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 500px; height: auto; max-height: 90vh; background: white; border-radius: 20px;
@@ -322,30 +323,26 @@
     </div>
 
     <script>
-        // --- FUNKCJA RESPONSYWNOŚCI (POPRAWIONA) ---
+        // --- FUNKCJA RESPONSYWNOŚCI ---
         function handleResize() {
             const container = document.getElementById('main-system');
             const pageWrapper = document.getElementById('page-wrapper');
             const title = document.getElementById('main-title');
+            
+            // Pobranie realnej szerokości okna
             const screenWidth = window.innerWidth;
             const baseWidth = 1200; 
             const baseHeight = 1250;
 
-            // Obliczamy skalę na podstawie szerokości okna z lekkim marginesem
             let scale = (screenWidth - 20) / baseWidth;
-            
-            // Na komputerach nie powiększamy powyżej 100%
             if (scale > 1) scale = 1;
 
-            // Skalujemy schemat
             container.style.transform = `scale(${scale})`;
             container.style.webkitTransform = `scale(${scale})`;
             
-            // Dynamicznie dostosowujemy wysokość wrapper-a, aby nie było dziury pod spodem
-            // 150 to zapas na tytuł i marginesy
-            pageWrapper.style.height = (baseHeight * scale + 150) + "px";
+            // Dynamiczna wysokość wrappera zapobiega lukom pod schematem
+            pageWrapper.style.height = (baseHeight * scale + 160) + "px";
 
-            // Zmniejszamy czcionkę tytułu na komórkach
             if (screenWidth < 600) {
                 title.style.fontSize = "18px";
             } else {
@@ -356,7 +353,7 @@
         window.addEventListener('load', handleResize);
         window.addEventListener('resize', handleResize);
 
-        // --- KONFIGURACJA LINKÓW SUPLA ---
+        // --- KONFIGURACJA LINKÓW I LOGIKA SUPLA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
@@ -461,16 +458,23 @@
             } catch (err) { document.getElementById(labelId).innerText = "BŁĄD"; }
         }
 
+        // --- FUNKCJA LOGOWANIA Z POPRAWKĄ SKALOWANIA ---
         function checkLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             if (u === "admin" && p === "1234") {
+                // Ukrycie logowania i pokazanie systemu
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
-                handleResize(); // Uruchomienie skalowania zaraz po zalogowaniu
+                // WYMUSZENIE AKTUALIZACJI SKALI PO POKAZANIU ELEMENTÓW
+                setTimeout(() => {
+                    handleResize();
+                    window.scrollTo(0, 0); 
+                }, 100);
 
+                // Start interwałów
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
