@@ -11,10 +11,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px 0; /* Zmniejszony padding dla urządzeń mobilnych */
+            padding: 20px;
             margin: 0;
-            overflow-x: hidden; /* ZMIANA 2: Ukrycie poziomego paska przewijania */
-            /* Usunięto min-width: 1250px */
+            /* POPRAWKA 2: Usunięto sztywne min-width, dodano zabezpieczenie przed przesuwaniem na boki */
+            overflow-x: hidden;
         }
 
         #login-overlay {
@@ -40,8 +40,6 @@
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             width: 350px;
-            max-width: 90%; /* ZMIANA 3: Dopasowanie okna logowania do wąskich ekranów */
-            box-sizing: border-box;
             border: 2px solid #ccc;
         }
 
@@ -52,7 +50,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 18px;
-            box-sizing: border-box;
         }
 
         .login-box button {
@@ -81,25 +78,13 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             overflow: hidden;
-            /* Usunięto flex-shrink */
-            transform-origin: top center; /* ZMIANA 4: Punkt odniesienia dla skalowania */
+            flex-shrink: 0;
+            /* POPRAWKA 3: Punkt zakotwiczenia skalowania */
+            transform-origin: top center;
             margin: 0 auto;
         }
 
-        #main-title {
-            color: #333; 
-            text-align: center;
-            padding: 0 15px;
-        }
-
-        /* ZMIANA 5: Responsywny tytuł */
-        @media (max-width: 768px) {
-            #main-title {
-                font-size: 1.2rem;
-                margin-top: 10px;
-            }
-        }
-
+        /* --- PONIŻEJ WSZYSTKIE TWOJE ORYGINALNE STYLE --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -183,13 +168,9 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* ZMIANA 6: Modal dostosowany do urządzeń mobilnych */
         #custom-window {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 95vw; max-width: 500px; /* Zamiast stałych 500px */
-            height: 95vw; max-height: 500px; 
-            box-sizing: border-box;
-            background: white; border-radius: 20px;
+            width: 500px; height: 500px; background: white; border-radius: 20px;
             box-shadow: 0 0 100px rgba(0,0,0,0.6); z-index: 20000; display: none;
             flex-direction: column; padding: 15px; border: 5px solid #2e7d32;
         }
@@ -242,7 +223,7 @@
         </div>
     </div>
 
-    <h2 id="main-title">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
+    <h2 id="main-title" style="color: #333; text-align: center;">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
 
     <div class="system-container" id="main-system">
         <div class="section-label" style="top: 0px;">System Grzewczy</div>
@@ -358,46 +339,43 @@
     </div>
 
     <script>
-        // ZMIANA 7: Skrypt do inteligentnego skalowania kontenera na mniejszych ekranach
-        function adjustScaleForMobile() {
+        // POPRAWKA 4: FUNKCJA SKALUJĄCA (Nowa funkcja)
+        function adjustScale() {
             const container = document.getElementById('main-system');
             const screenWidth = window.innerWidth;
-            const targetWidth = 1250; 
-            
-            if (screenWidth < targetWidth) {
-                // Obliczamy potrzebną skalę (minus mały margines bezpieczeństwa)
-                const scale = (screenWidth - 20) / targetWidth;
+            const designWidth = 1200; // Szerokość Twojego kontenera
+
+            if (screenWidth < designWidth) {
+                const scale = (screenWidth - 20) / designWidth;
                 container.style.transform = `scale(${scale})`;
                 
-                // Redukujemy niepotrzebne puste miejsce na dole po pomniejszeniu
-                const visualHeight = 1250 * scale;
-                container.style.marginBottom = `-${1250 - visualHeight}px`;
+                // Poprawka dla dolnego marginesu (usuwa dziurę pod schematem)
+                const scaledHeight = 1250 * scale;
+                container.style.marginBottom = `-${1250 - scaledHeight}px`;
             } else {
                 container.style.transform = 'none';
                 container.style.marginBottom = '0';
             }
         }
 
-        // Podpinamy funkcję pod ładowanie i każdą zmianę rozmiaru okna
-        window.addEventListener('resize', adjustScaleForMobile);
-        window.addEventListener('DOMContentLoaded', adjustScaleForMobile);
+        // Reaguj na obrót telefonu
+        window.addEventListener('resize', () => {
+            if(document.getElementById('main-system').style.visibility === 'visible') {
+                adjustScale();
+            }
+        });
 
-
-        // --- KONFIGURACJA LINKÓW SUPLA ---
+        // --- TWOJE ORYGINALNE LINKI I LOGIKA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/103/MmytzpvY8Hk3gqr/read';
-
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
         const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
-
         const L_PRZOD_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_PRZOD_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_PRZOD_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-
         const L_TYL_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_TYL_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_TYL_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
-
         const linkSuplaT1 = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const LINK_MIN = 'https://svr155.supla.org/direct/41/pbYMmDddH2cK8/read';
         const LINK_MAX = 'https://svr155.supla.org/direct/42/NbHLE2_bbP4e/read';
@@ -426,29 +404,18 @@
 
         async function updateModalTemperatures() {
             if (!activeZone) return;
-
             let urls;
-            if (activeZone === 'ROZSADNIK') {
-                urls = [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA];
-            } else if (activeZone === 'PRZÓD') {
-                urls = [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA];
-            } else {
-                urls = [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
-            }
-
+            if (activeZone === 'ROZSADNIK') urls = [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA];
+            else if (activeZone === 'PRZÓD') urls = [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA];
+            else urls = [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
             const sensorIds = ['modal-temp-red', 'modal-temp-blue', 'modal-temp-pump'];
-
             for (let i = 0; i < urls.length; i++) {
                 try {
                     const res = await fetch(buildUrl(urls[i]));
                     const data = await res.json();
                     let t = data.temperature ?? data.temp ?? data.state?.temp;
-                    if (t !== undefined && t !== null) {
-                        document.getElementById(sensorIds[i]).innerText = parseFloat(t).toFixed(1) + "°C";
-                    }
-                } catch (e) {
-                    document.getElementById(sensorIds[i]).innerText = "?? °C";
-                }
+                    if (t !== undefined && t !== null) document.getElementById(sensorIds[i]).innerText = parseFloat(t).toFixed(1) + "°C";
+                } catch (e) { document.getElementById(sensorIds[i]).innerText = "?? °C"; }
             }
         }
 
@@ -457,9 +424,7 @@
                 const res = await fetch(buildUrl(linkSuplaT1));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null) {
-                    document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C";
-                }
+                if (t !== null) document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C";
             } catch (e) { console.error("Błąd Supla T1"); }
         }
 
@@ -468,12 +433,8 @@
                 const res = await fetch(buildUrl(L_AIR_NURSERY_TEMP));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null && t !== undefined) {
-                    document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C";
-                }
-            } catch (e) { 
-                console.error("Błąd pobierania temperatury powietrza Rozsadnik"); 
-            }
+                if (t !== null && t !== undefined) document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C";
+            } catch (e) { console.error("Błąd pobierania temperatury powietrza Rozsadnik"); }
         }
 
         let toggleState = false;
@@ -482,7 +443,6 @@
             const v2 = document.getElementById('valve-z2');
             const pipesZ1 = [document.getElementById('p-z1-1'), document.getElementById('p-z1-2'), document.getElementById('p-z1-3')];
             const pipesZ2 = [document.getElementById('p-z2-1'), document.getElementById('p-z2-2'), document.getElementById('p-z2-3')];
-
             if (toggleState) {
                 v1.classList.add('active'); v2.classList.remove('active');
                 pipesZ1.forEach(p => p.classList.remove('inactive'));
@@ -530,15 +490,14 @@
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
-                // Wywołanie przeliczenia skali na wypadek odsłonięcia układu
-                setTimeout(adjustScaleForMobile, 100);
+                // POPRAWKA 5: Uruchomienie skalowania po zalogowaniu
+                adjustScale();
 
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
                 setInterval(updateValvesAnimation, 5000); updateValvesAnimation();
                 setInterval(updateModalTemperatures, 10000);
-
                 setInterval(() => {
                     updateTankLogic(LINK_MIN, LINK_MAX, 'tank1-bar', 'tank1-label');
                     updateTankLogic(LINK_MIN, LINK_MAX, 'tank2-bar', 'tank2-label');
