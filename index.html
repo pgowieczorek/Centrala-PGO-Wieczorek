@@ -2,19 +2,24 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
-        /* Twoje oryginalne style pozostają bez zmian */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        /* RESET I PODSTAWOWE USTAWIENIA DLA RESPONSYWNOŚCI */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden; /* Zapobiega przesuwaniu na boki */
             background-color: #eef2f3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 0;
-            margin: 0;
-            overflow-x: hidden;
         }
 
         .system-wrapper {
@@ -22,36 +27,24 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transform-origin: top center;
-            transition: height 0.3s ease;
+            transform-origin: top center; /* Skalowanie od góry */
+            padding-bottom: 50px;
         }
 
         #main-title {
             color: #333;
             text-align: center;
-            transition: font-size 0.3s;
             padding: 10px;
             margin: 10px 0;
-            z-index: 100;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 350px;
-            border: 2px solid #ccc;
-        }
-
+        /* BOX LOGOWANIA */
         #login-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: #2c3e50 url('20240312_105404.jpg') center/cover;
             display: flex;
             justify-content: center;
@@ -59,13 +52,24 @@
             z-index: 10000;
         }
 
-        .login-box input {
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
             width: 90%;
-            padding: 15px;
-            margin: 12px 0;
+            max-width: 350px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 8px;
-            font-size: 18px;
+            box-sizing: border-box;
+            font-size: 16px; /* Zapobiega zoomowi w iOS */
         }
 
         .login-box button {
@@ -80,11 +84,10 @@
             font-size: 18px;
         }
 
-        .system-container, h2#main-title { visibility: hidden; }
-
+        /* KONTENER SCHEMATU */
         .system-container {
             position: relative;
-            width: 1200px; 
+            width: 1200px; /* Szerokość bazowa projektu */
             height: 1250px;
             background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
                         url('20240312_105404.jpg');
@@ -94,11 +97,11 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             flex-shrink: 0;
-            transform-origin: top center; 
-            margin-bottom: 50px;
+            transform-origin: top center;
+            visibility: hidden; /* Ukryte przed zalogowaniem */
         }
 
-        /* --- STYLE ELEMENTÓW (Twoje oryginalne) --- */
+        /* --- Stylizacja elementów wewnątrz schematu (bez zmian technicznych) --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -160,7 +163,6 @@
         .pump-icon::after { content: 'P'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; font-weight: bold; }
         .valve-3d { width: 34px; height: 34px; background: #fb8c00; border: 2px solid #ef6c00; margin-top: 12px; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* OKNO MODALNE (Schemat Węzła) */
         #custom-window {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 500px; height: auto; max-height: 90vh; background: white; border-radius: 20px;
@@ -197,7 +199,7 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:#333; margin-bottom:20px; visibility: visible;">SYSTEM DOZORU</h2>
+            <h2 style="color:#333; margin-bottom:20px;">SYSTEM DOZORU</h2>
             <input type="text" id="username" placeholder="Użytkownik" spellcheck="false">
             <input type="password" id="password" placeholder="Hasło">
             <button onclick="checkLogin()">ZALOGUJ</button>
@@ -206,7 +208,7 @@
     </div>
 
     <div class="system-wrapper" id="page-wrapper">
-        <h2 id="main-title">Schemat Gospodarstwa<br> <small>Monitoring Systemów: Grzewczego i Nawadniania</small></h2>
+        <h2 id="main-title" style="visibility: hidden;">Schemat Gospodarstwa<br> <small>Monitoring Systemów: Grzewczego i Nawadniania</small></h2>
 
         <div class="system-container" id="main-system">
             <div class="section-label" style="top: 0px;">System Grzewczy</div>
@@ -281,7 +283,7 @@
 
             <div class="pipe pipe-h p-red" style="width: 374px; left: 476px; top: 340px;"><div class="flow"></div></div>
             <div class="pipe-sensor sensor-hot" style="left: 485px; top: 320px;" id="temp-t2-hot">T: -- °C</div>
-            <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="v-flow" style="animation-direction: reverse;"></div></div>
+            <div class="pipe pipe-h p-blue" style="width: 274px; left: 576px; top: 360px;"><div class="flow"></div></div>
             <div class="pipe-sensor sensor-cold" style="left: 585px; top: 370px;" id="temp-t2-cold">T: -- °C</div>
 
             <div class="section-label" style="top: 900px;">System Nawadniania</div>
@@ -329,35 +331,44 @@
             const pageWrapper = document.getElementById('page-wrapper');
             const title = document.getElementById('main-title');
             
-            // Pobranie realnej szerokości okna
-            const screenWidth = window.innerWidth;
-            const baseWidth = 1200; 
-            const baseHeight = 1250;
+            // Pobieramy wymiary okna
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            
+            const baseWidth = 1200; // Bazowa szerokość schematu
+            const baseHeight = 1250; // Bazowa wysokość schematu
 
-            let scale = (screenWidth - 20) / baseWidth;
+            // Skala oparta na szerokości ekranu (z lekkim marginesem 20px)
+            let scale = (windowWidth - 20) / baseWidth;
+            
+            // Ograniczamy skalę maksymalną do 1 (nie powiększamy na siłę na wielkich monitorach)
             if (scale > 1) scale = 1;
 
+            // Zastosowanie transformacji
             container.style.transform = `scale(${scale})`;
-            container.style.webkitTransform = `scale(${scale})`;
             
-            // Dynamiczna wysokość wrappera zapobiega lukom pod schematem
-            pageWrapper.style.height = (baseHeight * scale + 160) + "px";
+            // Dostosowanie widoczności kontenera (naprawia przeskok przy ładowaniu)
+            container.style.visibility = 'visible';
+            title.style.visibility = 'visible';
 
-            if (screenWidth < 600) {
-                title.style.fontSize = "18px";
-            } else {
-                title.style.fontSize = "30px";
-            }
+            // Dynamiczne dostosowanie wysokości wrapper'a, żeby stopka nie nachodziła na schemat
+            pageWrapper.style.height = (baseHeight * scale + 150) + "px";
+            
+            // Skalowanie tekstu tytułowego
+            title.style.fontSize = Math.max(16, 28 * scale) + "px";
         }
 
-        window.addEventListener('load', handleResize);
-        window.addEventListener('resize', handleResize);
-
-        // --- KONFIGURACJA LINKÓW I LOGIKA SUPLA ---
+        // --- KONFIGURACJA LINKÓW SUPLA (BEZ ZMIAN) ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
         const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
+        const L_PRZOD_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_PRZOD_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_PRZOD_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_TYL_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_TYL_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+        const L_TYL_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const linkSuplaT1 = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const LINK_MIN = 'https://svr155.supla.org/direct/41/pbYMmDddH2cK8/read';
         const LINK_MAX = 'https://svr155.supla.org/direct/42/NbHLE2_bbP4e/read';
@@ -386,7 +397,8 @@
 
         async function updateModalTemperatures() {
             if (!activeZone) return;
-            let urls = (activeZone === 'ROZSADNIK') ? [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA] : [linkSuplaT1, linkSuplaT1, linkSuplaT1];
+            let urls = (activeZone === 'ROZSADNIK') ? [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA] : 
+                       (activeZone === 'PRZÓD') ? [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA] : [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
             const sensorIds = ['modal-temp-red', 'modal-temp-blue', 'modal-temp-pump'];
             for (let i = 0; i < urls.length; i++) {
                 try {
@@ -458,23 +470,17 @@
             } catch (err) { document.getElementById(labelId).innerText = "BŁĄD"; }
         }
 
-        // --- FUNKCJA LOGOWANIA Z POPRAWKĄ SKALOWANIA ---
         function checkLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             if (u === "admin" && p === "1234") {
-                // Ukrycie logowania i pokazanie systemu
                 document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-system').style.visibility = 'visible';
-                document.getElementById('main-title').style.visibility = 'visible';
                 
-                // WYMUSZENIE AKTUALIZACJI SKALI PO POKAZANIU ELEMENTÓW
-                setTimeout(() => {
-                    handleResize();
-                    window.scrollTo(0, 0); 
-                }, 100);
+                // Kluczowe: Wywołanie skalowania od razu po zalogowaniu
+                handleResize();
+                window.addEventListener('resize', handleResize);
 
-                // Start interwałów
+                // Start procesów monitoringu
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
@@ -491,6 +497,7 @@
         }
 
         function update() {
+            // Symulacja pozostałych danych
             document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
             document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
