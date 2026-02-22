@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -11,10 +11,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px;
+            padding: 10px 0; /* Zmniejszony padding dla urządzeń mobilnych */
             margin: 0;
-            /* Usunięto min-width: 1250px dla lepszej responsywności */
-            overflow-x: hidden;
+            overflow-x: hidden; /* ZMIANA 2: Ukrycie poziomego paska przewijania */
+            /* Usunięto min-width: 1250px */
         }
 
         #login-overlay {
@@ -39,8 +39,9 @@
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 85%;
-            max-width: 350px;
+            width: 350px;
+            max-width: 90%; /* ZMIANA 3: Dopasowanie okna logowania do wąskich ekranów */
+            box-sizing: border-box;
             border: 2px solid #ccc;
         }
 
@@ -51,6 +52,7 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 18px;
+            box-sizing: border-box;
         }
 
         .login-box button {
@@ -67,7 +69,6 @@
 
         .system-container, h2 { visibility: hidden; }
 
-        /* GŁÓWNA ZMIANA: Kontener skaluje się do szerokości ekranu */
         .system-container {
             position: relative;
             width: 1200px;
@@ -80,19 +81,23 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
             overflow: hidden;
-            flex-shrink: 0;
-            transform-origin: top center;
+            /* Usunięto flex-shrink */
+            transform-origin: top center; /* ZMIANA 4: Punkt odniesienia dla skalowania */
+            margin: 0 auto;
         }
 
-        /* Automatyczne dopasowanie do mniejszych ekranów */
-        @media (max-width: 1220px) {
-            .system-container {
-                zoom: calc(100vw / 1250);
-                -moz-transform: scale(calc(100vw / 1250)); /* Poprawka dla Firefox */
-                -moz-transform-origin: top center;
+        #main-title {
+            color: #333; 
+            text-align: center;
+            padding: 0 15px;
+        }
+
+        /* ZMIANA 5: Responsywny tytuł */
+        @media (max-width: 768px) {
+            #main-title {
+                font-size: 1.2rem;
+                margin-top: 10px;
             }
-            body { padding: 5px; }
-            h2#main-title { font-size: 1.2rem; }
         }
 
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
@@ -178,9 +183,13 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        /* ZMIANA 6: Modal dostosowany do urządzeń mobilnych */
         #custom-window {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 500px; height: auto; min-height: 400px; background: white; border-radius: 20px;
+            width: 95vw; max-width: 500px; /* Zamiast stałych 500px */
+            height: 95vw; max-height: 500px; 
+            box-sizing: border-box;
+            background: white; border-radius: 20px;
             box-shadow: 0 0 100px rgba(0,0,0,0.6); z-index: 20000; display: none;
             flex-direction: column; padding: 15px; border: 5px solid #2e7d32;
         }
@@ -233,7 +242,7 @@
         </div>
     </div>
 
-    <h2 id="main-title" style="color: #333; text-align: center;">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
+    <h2 id="main-title">Schemat Gospodarstwa<br> Monitoring Systemów: Grzewczego i Nawadniania</h2>
 
     <div class="system-container" id="main-system">
         <div class="section-label" style="top: 0px;">System Grzewczy</div>
@@ -349,17 +358,46 @@
     </div>
 
     <script>
+        // ZMIANA 7: Skrypt do inteligentnego skalowania kontenera na mniejszych ekranach
+        function adjustScaleForMobile() {
+            const container = document.getElementById('main-system');
+            const screenWidth = window.innerWidth;
+            const targetWidth = 1250; 
+            
+            if (screenWidth < targetWidth) {
+                // Obliczamy potrzebną skalę (minus mały margines bezpieczeństwa)
+                const scale = (screenWidth - 20) / targetWidth;
+                container.style.transform = `scale(${scale})`;
+                
+                // Redukujemy niepotrzebne puste miejsce na dole po pomniejszeniu
+                const visualHeight = 1250 * scale;
+                container.style.marginBottom = `-${1250 - visualHeight}px`;
+            } else {
+                container.style.transform = 'none';
+                container.style.marginBottom = '0';
+            }
+        }
+
+        // Podpinamy funkcję pod ładowanie i każdą zmianę rozmiaru okna
+        window.addEventListener('resize', adjustScaleForMobile);
+        window.addEventListener('DOMContentLoaded', adjustScaleForMobile);
+
+
         // --- KONFIGURACJA LINKÓW SUPLA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/103/MmytzpvY8Hk3gqr/read';
+
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
         const L_ROZSADNIK_POMPA = 'https://svr155.supla.org/direct/95/fVcFTJvSJs/read';
+
         const L_PRZOD_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_PRZOD_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_PRZOD_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+
         const L_TYL_ZASILANIE = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_TYL_POWROT = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const L_TYL_POMPA = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
+
         const linkSuplaT1 = 'https://svr155.supla.org/direct/43/4VZvKEZQqUQ/read';
         const LINK_MIN = 'https://svr155.supla.org/direct/41/pbYMmDddH2cK8/read';
         const LINK_MAX = 'https://svr155.supla.org/direct/42/NbHLE2_bbP4e/read';
@@ -388,6 +426,7 @@
 
         async function updateModalTemperatures() {
             if (!activeZone) return;
+
             let urls;
             if (activeZone === 'ROZSADNIK') {
                 urls = [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA];
@@ -396,7 +435,9 @@
             } else {
                 urls = [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
             }
+
             const sensorIds = ['modal-temp-red', 'modal-temp-blue', 'modal-temp-pump'];
+
             for (let i = 0; i < urls.length; i++) {
                 try {
                     const res = await fetch(buildUrl(urls[i]));
@@ -405,7 +446,9 @@
                     if (t !== undefined && t !== null) {
                         document.getElementById(sensorIds[i]).innerText = parseFloat(t).toFixed(1) + "°C";
                     }
-                } catch (e) { document.getElementById(sensorIds[i]).innerText = "?? °C"; }
+                } catch (e) {
+                    document.getElementById(sensorIds[i]).innerText = "?? °C";
+                }
             }
         }
 
@@ -414,7 +457,9 @@
                 const res = await fetch(buildUrl(linkSuplaT1));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null) { document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C"; }
+                if (t !== null) {
+                    document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C";
+                }
             } catch (e) { console.error("Błąd Supla T1"); }
         }
 
@@ -423,8 +468,12 @@
                 const res = await fetch(buildUrl(L_AIR_NURSERY_TEMP));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null && t !== undefined) { document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C"; }
-            } catch (e) { console.error("Błąd pobierania temperatury powietrza Rozsadnik"); }
+                if (t !== null && t !== undefined) {
+                    document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C";
+                }
+            } catch (e) { 
+                console.error("Błąd pobierania temperatury powietrza Rozsadnik"); 
+            }
         }
 
         let toggleState = false;
@@ -433,6 +482,7 @@
             const v2 = document.getElementById('valve-z2');
             const pipesZ1 = [document.getElementById('p-z1-1'), document.getElementById('p-z1-2'), document.getElementById('p-z1-3')];
             const pipesZ2 = [document.getElementById('p-z2-1'), document.getElementById('p-z2-2'), document.getElementById('p-z2-3')];
+
             if (toggleState) {
                 v1.classList.add('active'); v2.classList.remove('active');
                 pipesZ1.forEach(p => p.classList.remove('inactive'));
@@ -480,6 +530,9 @@
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
+                // Wywołanie przeliczenia skali na wypadek odsłonięcia układu
+                setTimeout(adjustScaleForMobile, 100);
+
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
