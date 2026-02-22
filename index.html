@@ -2,24 +2,18 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
-        /* RESET I PODSTAWOWE USTAWIENIA DLA RESPONSYWNOŚCI */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden; /* Zapobiega przesuwaniu na boki */
-            background-color: #eef2f3;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f3;
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
         }
 
         .system-wrapper {
@@ -27,24 +21,35 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transform-origin: top center; /* Skalowanie od góry */
-            padding-bottom: 50px;
+            transform-origin: top center;
         }
 
         #main-title {
             color: #333;
             text-align: center;
+            transition: font-size 0.3s;
             padding: 10px;
             margin: 10px 0;
-            width: 100%;
-            box-sizing: border-box;
+            visibility: hidden; /* Ukryte do czasu zalogowania */
         }
 
-        /* BOX LOGOWANIA */
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 350px;
+            border: 2px solid #ccc;
+        }
+
         #login-overlay {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
             background: #2c3e50 url('20240312_105404.jpg') center/cover;
             display: flex;
             justify-content: center;
@@ -52,24 +57,13 @@
             z-index: 10000;
         }
 
-        .login-box {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 90%;
-            max-width: 350px;
-        }
-
         .login-box input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
+            width: 90%;
+            padding: 15px;
+            margin: 12px 0;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px; /* Zapobiega zoomowi w iOS */
+            font-size: 18px;
         }
 
         .login-box button {
@@ -84,10 +78,9 @@
             font-size: 18px;
         }
 
-        /* KONTENER SCHEMATU */
         .system-container {
             position: relative;
-            width: 1200px; /* Szerokość bazowa projektu */
+            width: 1200px;
             height: 1250px;
             background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)),
                         url('20240312_105404.jpg');
@@ -96,12 +89,13 @@
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             border: 1px solid #ccc;
+            overflow: hidden;
             flex-shrink: 0;
             transform-origin: top center;
-            visibility: hidden; /* Ukryte przed zalogowaniem */
+            visibility: hidden; /* Ukryte do czasu zalogowania */
         }
 
-        /* --- Stylizacja elementów wewnątrz schematu (bez zmian technicznych) --- */
+        /* --- TWOJE STYLE ELEMENTÓW --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -199,7 +193,7 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="color:#333; margin-bottom:20px;">SYSTEM DOZORU</h2>
+            <h2 style="color:#333; margin-bottom:20px; visibility: visible;">SYSTEM DOZORU</h2>
             <input type="text" id="username" placeholder="Użytkownik" spellcheck="false">
             <input type="password" id="password" placeholder="Hasło">
             <button onclick="checkLogin()">ZALOGUJ</button>
@@ -208,7 +202,7 @@
     </div>
 
     <div class="system-wrapper" id="page-wrapper">
-        <h2 id="main-title" style="visibility: hidden;">Schemat Gospodarstwa<br> <small>Monitoring Systemów: Grzewczego i Nawadniania</small></h2>
+        <h2 id="main-title">Schemat Gospodarstwa<br> <small>Monitoring Systemów: Grzewczego i Nawadniania</small></h2>
 
         <div class="system-container" id="main-system">
             <div class="section-label" style="top: 0px;">System Grzewczy</div>
@@ -331,34 +325,25 @@
             const pageWrapper = document.getElementById('page-wrapper');
             const title = document.getElementById('main-title');
             
-            // Pobieramy wymiary okna
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            
-            const baseWidth = 1200; // Bazowa szerokość schematu
-            const baseHeight = 1250; // Bazowa wysokość schematu
+            // Jeśli elementy są ukryte (przed zalogowaniem), nie skaluj
+            if (container.style.visibility === 'hidden') return;
 
-            // Skala oparta na szerokości ekranu (z lekkim marginesem 20px)
-            let scale = (windowWidth - 20) / baseWidth;
-            
-            // Ograniczamy skalę maksymalną do 1 (nie powiększamy na siłę na wielkich monitorach)
-            if (scale > 1) scale = 1;
+            const screenWidth = window.innerWidth;
+            const baseWidth = 1200; 
 
-            // Zastosowanie transformacji
-            container.style.transform = `scale(${scale})`;
-            
-            // Dostosowanie widoczności kontenera (naprawia przeskok przy ładowaniu)
-            container.style.visibility = 'visible';
-            title.style.visibility = 'visible';
-
-            // Dynamiczne dostosowanie wysokości wrapper'a, żeby stopka nie nachodziła na schemat
-            pageWrapper.style.height = (baseHeight * scale + 150) + "px";
-            
-            // Skalowanie tekstu tytułowego
-            title.style.fontSize = Math.max(16, 28 * scale) + "px";
+            if (screenWidth < baseWidth + 40) {
+                const scale = (screenWidth - 20) / baseWidth;
+                container.style.transform = `scale(${scale})`;
+                title.style.fontSize = Math.max(16, 30 * scale) + "px";
+                pageWrapper.style.height = (1250 * scale + 150) + "px";
+            } else {
+                container.style.transform = 'scale(1)';
+                title.style.fontSize = "30px";
+                pageWrapper.style.height = "auto";
+            }
         }
 
-        // --- KONFIGURACJA LINKÓW SUPLA (BEZ ZMIAN) ---
+        // --- KONFIGURACJA LINKÓW SUPLA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/98/Qz7sr2TC5Xmn/read';
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
@@ -470,17 +455,32 @@
             } catch (err) { document.getElementById(labelId).innerText = "BŁĄD"; }
         }
 
+        // --- POPRAWIONA FUNKCJA LOGOWANIA Z AUTO-SKALOWANIEM ---
         function checkLogin() {
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             if (u === "admin" && p === "1234") {
+                // 1. Ukrywamy logowanie i pokazujemy system
                 document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-system').style.visibility = 'visible';
+                document.getElementById('main-title').style.visibility = 'visible';
                 
-                // Kluczowe: Wywołanie skalowania od razu po zalogowaniu
+                // 2. KLUCZ DO NAPRAWY: Wymuszenie skalowania natychmiast...
                 handleResize();
-                window.addEventListener('resize', handleResize);
 
-                // Start procesów monitoringu
+                // ...oraz po 150ms, gdy przeglądarka "odświeży" widok po zniknięciu logowania
+                setTimeout(() => {
+                    handleResize();
+                    window.scrollTo(0, 0); 
+                }, 150);
+
+                // 3. Dodanie stałego nasłuchiwania na zmiany okna i obrót telefonu
+                window.addEventListener('resize', handleResize);
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(handleResize, 300);
+                });
+
+                // 4. Start interwałów
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
                 setInterval(update, 3000); update();
@@ -497,7 +497,6 @@
         }
 
         function update() {
-            // Symulacja pozostałych danych
             document.getElementById('air-t2').innerText = (19 + Math.random() * 5).toFixed(1) + "°C";
             document.getElementById('air-gh').innerText = (21 + Math.random() * 4).toFixed(1) + "°C";
             document.getElementById('temp-exhaust-large').innerText = "Temp. spalin: " + (120 + Math.random() * 60).toFixed(1) + "°C";
