@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System HVAC i Nawadniania - Gotowy Schemat</title>
     <style>
         body {
@@ -11,10 +11,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 0;
             margin: 0;
-            /* POPRAWKA 2: Usunięto sztywne min-width, dodano zabezpieczenie przed przesuwaniem na boki */
-            overflow-x: hidden;
+            overflow-x: hidden; /* Zapobiega przewijaniu na boki na telefonie */
         }
 
         #login-overlay {
@@ -39,7 +38,7 @@
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            width: 350px;
+            width: 320px;
             border: 2px solid #ccc;
         }
 
@@ -79,12 +78,11 @@
             border: 1px solid #ccc;
             overflow: hidden;
             flex-shrink: 0;
-            /* POPRAWKA 3: Punkt zakotwiczenia skalowania */
+            /* Nowe właściwości do skalowania */
             transform-origin: top center;
-            margin: 0 auto;
+            transition: transform 0.3s ease;
         }
 
-        /* --- PONIŻEJ WSZYSTKIE TWOJE ORYGINALNE STYLE --- */
         .section-label { position: absolute; left: 20px; font-size: 30px; font-weight: bold; color: #555; text-transform: uppercase; border-bottom: 2px solid #ccc; z-index: 30; }
         .device { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; color: white; border-radius: 8px; z-index: 10; text-align: center; line-height: 1.2; }
         .greenhouse { background: #4caf50; border: 3px solid #2e7d32; width: 300px; height: 120px; left: 40px; top: 80px; z-index: 10; }
@@ -339,33 +337,26 @@
     </div>
 
     <script>
-        // POPRAWKA 4: FUNKCJA SKALUJĄCA (Nowa funkcja)
-        function adjustScale() {
+        // --- FUNKCJA AUTOMATYCZNEGO DOPASOWANIA ---
+        function adjustLayout() {
             const container = document.getElementById('main-system');
             const screenWidth = window.innerWidth;
-            const designWidth = 1200; // Szerokość Twojego kontenera
+            const designWidth = 1250; // Szerokość bazowa schematu
 
             if (screenWidth < designWidth) {
-                const scale = (screenWidth - 20) / designWidth;
+                const scale = screenWidth / designWidth;
                 container.style.transform = `scale(${scale})`;
                 
-                // Poprawka dla dolnego marginesu (usuwa dziurę pod schematem)
+                // Korekta marginesu dolnego, aby stopka nie była za daleko
                 const scaledHeight = 1250 * scale;
-                container.style.marginBottom = `-${1250 - scaledHeight}px`;
+                document.body.style.height = (scaledHeight + 150) + "px";
             } else {
-                container.style.transform = 'none';
-                container.style.marginBottom = '0';
+                container.style.transform = "scale(1)";
+                document.body.style.height = "auto";
             }
         }
 
-        // Reaguj na obrót telefonu
-        window.addEventListener('resize', () => {
-            if(document.getElementById('main-system').style.visibility === 'visible') {
-                adjustScale();
-            }
-        });
-
-        // --- TWOJE ORYGINALNE LINKI I LOGIKA ---
+        // --- KONFIGURACJA LINKÓW SUPLA ---
         const L_AIR_NURSERY_TEMP = 'https://svr155.supla.org/direct/103/MmytzpvY8Hk3gqr/read';
         const L_ROZSADNIK_ZASILANIE = 'https://svr155.supla.org/direct/97/CcmuVwdkw9N/read';
         const L_ROZSADNIK_POWROT = 'https://svr155.supla.org/direct/96/dEjCuvCp4SAKm/read';
@@ -405,16 +396,22 @@
         async function updateModalTemperatures() {
             if (!activeZone) return;
             let urls;
-            if (activeZone === 'ROZSADNIK') urls = [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA];
-            else if (activeZone === 'PRZÓD') urls = [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA];
-            else urls = [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
+            if (activeZone === 'ROZSADNIK') {
+                urls = [L_ROZSADNIK_ZASILANIE, L_ROZSADNIK_POWROT, L_ROZSADNIK_POMPA];
+            } else if (activeZone === 'PRZÓD') {
+                urls = [L_PRZOD_ZASILANIE, L_PRZOD_POWROT, L_PRZOD_POMPA];
+            } else {
+                urls = [L_TYL_ZASILANIE, L_TYL_POWROT, L_TYL_POMPA];
+            }
             const sensorIds = ['modal-temp-red', 'modal-temp-blue', 'modal-temp-pump'];
             for (let i = 0; i < urls.length; i++) {
                 try {
                     const res = await fetch(buildUrl(urls[i]));
                     const data = await res.json();
                     let t = data.temperature ?? data.temp ?? data.state?.temp;
-                    if (t !== undefined && t !== null) document.getElementById(sensorIds[i]).innerText = parseFloat(t).toFixed(1) + "°C";
+                    if (t !== undefined && t !== null) {
+                        document.getElementById(sensorIds[i]).innerText = parseFloat(t).toFixed(1) + "°C";
+                    }
                 } catch (e) { document.getElementById(sensorIds[i]).innerText = "?? °C"; }
             }
         }
@@ -424,7 +421,7 @@
                 const res = await fetch(buildUrl(linkSuplaT1));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null) document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C";
+                if (t !== null) { document.getElementById('air-t1').innerText = parseFloat(t).toFixed(1) + "°C"; }
             } catch (e) { console.error("Błąd Supla T1"); }
         }
 
@@ -433,8 +430,8 @@
                 const res = await fetch(buildUrl(L_AIR_NURSERY_TEMP));
                 const data = await res.json();
                 let t = data.temperature ?? data.temp ?? data.state?.temp;
-                if (t !== null && t !== undefined) document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C";
-            } catch (e) { console.error("Błąd pobierania temperatury powietrza Rozsadnik"); }
+                if (t !== null && t !== undefined) { document.getElementById('air-nursery').innerText = parseFloat(t).toFixed(1) + "°C"; }
+            } catch (e) { console.error("Błąd temperatury Rozsadnik"); }
         }
 
         let toggleState = false;
@@ -490,8 +487,9 @@
                 document.getElementById('main-system').style.visibility = 'visible';
                 document.getElementById('main-title').style.visibility = 'visible';
                 
-                // POPRAWKA 5: Uruchomienie skalowania po zalogowaniu
-                adjustScale();
+                // Wywołanie dopasowania ekranu
+                adjustLayout();
+                window.addEventListener('resize', adjustLayout);
 
                 setInterval(fetchSuplaTemp, 5000); fetchSuplaTemp();
                 setInterval(fetchAirNursery, 5000); fetchAirNursery();
